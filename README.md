@@ -1,6 +1,10 @@
 # Keyp
 
-TODO: Write a gem description
+This gem manages environment/machine specific key/value pairs for your Ruby application.
+
+TODO: Add more details to description
+
+NOTE: This gem is at a very early stage in development.
 
 ## Installation
 
@@ -19,6 +23,19 @@ Or install it yourself as:
 ## Usage
 
 TODO: Write usage instructions here
+
+### Setup
+
+Configure
+
+Keyp uses the ~/.keyp directory by default. To override, set the environment variable, KEYP_HOME to your choice
+of directory.
+
+TODO: add Bash config setting to export Keyp ENV vars to the ENV or make ENV vars accessible via Keyp hashes
+
+### Quick overview
+
+
 
 ## Contributing
 

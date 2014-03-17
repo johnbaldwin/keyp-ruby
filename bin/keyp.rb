@@ -29,8 +29,21 @@ case run_mode
 
 # Check if an older version
 
+  when :heroku
+    # add self to libpath
+    $:.unshift File.expand_path("../../lib", bin_file)
+
+    #require "heroku/updater"
+    #Heroku::Updater.disable("`heroku update` is only available from Heroku Toolbelt.\nDownload and install from https://toolbelt.heroku.com")
+
+    # start up the CLI
+    require "keyp/cli"
+    # Heroku had ...agent = "heroku-gem/#{...}"
+    Keyp.user_agent = "keyp/#{Keyp::VERSION} (#{RUBY_PLATFORM}) ruby/#{RUBY_VERSION}"
+    Keyp::CLI.start(*ARGV)
+
   when :pry
-    # This is what pry does
+    # This is what pry does. The begin, rescue is for Ruby prior to 1.9
     $0 = 'keyp'
     begin
       require 'keyp'
