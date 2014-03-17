@@ -9,6 +9,8 @@
 # I'm trying out some of the different impementations for Keyp, learning how they work, pros and cons
 # Then I'll pick a single approach after exploring them
 
+# TO run in the project dir:
+# ruby -Ilib ./bin/keyp
 
 # resolve bin path, ignoring symlinks
 require 'pathname'
@@ -52,7 +54,7 @@ case run_mode
       require 'keyp'
     end
 
-# PRocess command line options and run Keyp
+# Process command line options and run Keyp
     Keyp::CLI.parse_options
   else
     puts "unhandled run_mode #{run_mode}"

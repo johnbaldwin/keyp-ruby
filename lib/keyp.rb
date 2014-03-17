@@ -47,7 +47,7 @@ module Keyp
   end
 
   # Some inspiration:
-  * http://stackoverflow.com/questions/2680523/dry-ruby-initialization-with-hash-argument
+  # http://stackoverflow.com/questions/2680523/dry-ruby-initialization-with-hash-argument
   #
   class Keyper
 
@@ -56,7 +56,7 @@ module Keyp
 
     def initialize(args)
       args.each do |k,v|
-        instance_variable_set ("@#{k}", v) unless v.nil?
+        instance_variable_set("@#{k}", v) unless v.nil?
 
         @keypdir ||= Keyp::DEFAULT_KEYP_PATH
         @default_bag ||= 'default'
