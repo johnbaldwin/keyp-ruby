@@ -10,8 +10,8 @@ module Keyp
   # Put this in initializer so testing can create its own directory and not muck
   # up the operational default
 
-  DEFAULT_KEYP_DIRNAME= '.keyp'
-  DEFAULT_KEYP_DIRPATH = File.join(ENV['HOME'], DEFAULT_KEYP_DIRNAME)
+
+  DEFAULT_KEYP_HOME = File.join(ENV['HOME'], '.keyp')
   DEFAULT_STORE = File.join(DEFAULT_KEYP_DIRPATH,'default.yml')
   # This method sets up the keyp director
   #def self.setup
@@ -21,23 +21,19 @@ module Keyp
   #  end
   #end
 
-  # Give full path
+  # Give full path, attempt to load
   # TODO: consider changing to class method
   def self.load_config(config_path)
     config_data = {}
     # Get extension
     file_ext = File.extname(config_path)
 
+    # Either we are aribitrarily creating directories when
+    # given a path for a file that doesn't exist
+    # or we have special behavior for the default dir
+    # or we just fault and let the caller deal with it
     unless File.exist? config_path
-      if config_path == DEFAULT_STORE
-        # create the default file
-        f = File.open(DEFAULT_STORE,'w')
-        #f.puts("default:")
-        f.close
-        return {}
-      else
         raise "Keyp config file not found: #{config_path}"
-      end
     end
 
     # check
@@ -56,6 +52,26 @@ module Keyp
     config_data
   end
 
+  def keyper(bagname, options: "options", scpe: "scope")
+    puts options
+  end
+
+  def self.setup(args={})
+
+    if config_path == DEFAULT_STORE
+      # create the default file
+
+      f = File.open(DEFAULT_STORE,'w')
+      #f.puts("default:")
+      f.close
+      return {}
+    else
+      raise "Non default stores not yet implemented"
+    end
+
+  end
+
+
   # Some inspiration:
   # http://stackoverflow.com/questions/2680523/dry-ruby-initialization-with-hash-argument
   #
@@ -64,10 +80,10 @@ module Keyp
   class Keyper
 
     attr_reader :keypdir, :default_bag
-    attr_accessor :current_bag, :config
+    attr_accessor :bag, :keys
 
     def config_path
-      File.join(@keypdir, @current_bag)
+      File.join(@keypdir, @bag)
     end
 
 
@@ -79,14 +95,14 @@ module Keyp
 
         @keypdir ||= Keyp::DEFAULT_KEYP_DIRPATH
         @default_bag ||= 'default'
-        @current_bag ||= @default_bag
+        @bag ||= @default_bag
         @read_only ||= false
         @ext ||= '.yml'
         # load our resource
 
         # load config file into hash
 
-        @config = Keyp::load_config(config_path+@ext)
+        @keys = Keyp::load_config(config_path+@ext)
       end
 
     end
