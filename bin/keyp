@@ -16,48 +16,31 @@
 require 'pathname'
 bin_file = Pathname.new(__FILE__).realpath
 
-# add self to libpath
-#$:/
+require 'gli'
+require 'keyp'
+include GLI::App
 
-run_mode = :bundler
+# keyp set key=value
+# keyp get key
+# keyp
 
-case run_mode
 
-  when :bundler
-# this is what bundler does in bundle
+program_desc 'A command line linterface for the Keyp key/value manager'
 
-    Signal.trap('INT') { exit 1 }
-    require 'keyp'
+flag [:b,:bag], default_value: 'default'
 
-# Check if an older version
-
-  when :heroku
-    # add self to libpath
-    $:.unshift File.expand_path("../../lib", bin_file)
-
-    #require "heroku/updater"
-    #Heroku::Updater.disable("`heroku update` is only available from Heroku Toolbelt.\nDownload and install from https://toolbelt.heroku.com")
-
-    # start up the CLI
-    require "keyp/cli"
-    # Heroku had ...agent = "heroku-gem/#{...}"
-    Keyp.user_agent = "keyp/#{Keyp::VERSION} (#{RUBY_PLATFORM}) ruby/#{RUBY_VERSION}"
-    Keyp::CLI.start(*ARGV)
-
-  when :pry
-    # This is what pry does. The begin, rescue is for Ruby prior to 1.9
-    $0 = 'keyp'
-    begin
-      require 'keyp'
-    rescue LoadError
-      require 'rubygems'
-      require 'keyp'
-    end
-
-# Process command line options and run Keyp
-    Keyp::CLI.parse_options
-  else
-    puts "unhandled run_mode #{run_mode}"
-
+pre do |global_options, command, options, args|
+  # initialize our store
+  $bag = Keyp.bag(global_options[:bag])
 end
 
+command :list do |c|
+  c.action do
+    $bag.data.each do |key,value|
+      #printf("$s : $s\n", key,value)
+      puts "#{key} = #{value}"
+    end
+  end
+end
+
+exit run(ARGV)
