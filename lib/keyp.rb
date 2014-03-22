@@ -73,6 +73,14 @@ module Keyp
 
   end
 
+  def self.create(bag, options={})
+    # two root sections in a bag
+    # meta:
+    #   meta will contain information for use by keyp about this particular bag
+    #   such as encoding rules, case sensitivity
+    # data:
+  end
+
   def self.bag(bag='default', options = {})
     keyper = Keyper.new(bag, options)
     keyper
