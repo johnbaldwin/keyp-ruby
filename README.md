@@ -1,10 +1,49 @@
 # Keyp
 
-This gem manages environment/machine specific key/value pairs for your Ruby application.
+Keyp is an executable Ruby gem that manages user/machine specific key/value pairs for your Ruby application.
 
-TODO: Add more details to description
+Web applications generally need sensitive information, like salts and keys. Managing these generally involves writing
+ a custom solution for your application. Approaches are typically environment variables, custom data files, or
+ environment setting scripts. Following best practices, we don't want to store these in version control with our
+ application source. So I'm creating Keyp to make it simple to manage keys for your application across the development,
+ testing, and production environments.
 
-NOTE: This gem is at a very early stage in development.
+## Quick Tour
+
+Keyp manages key value pairs in collections. As of version 0.0.1, Keyp refers to collections as *bags*. There is a
+default bag called *default*. Unless you specify a bag name, *default* will be used.
+
+Here are some command line examples showing some basic Keyp functionality using the default bag. Here we set a couple
+of keys, list all the key/value pairs in the default bag, and finally get the value for a single key.
+
+    $ keyp set cloud_access_id=BMT216AF63958
+    $ keyp set cloud_secret_key=eabca9a58834aec15af0578ac84abfbdab7c3795
+
+    $ keyp list
+    * bag:default
+    cloud_access_id: BMT216AF63958
+    cloud_secret_key: eabca9a58834aec15af0578ac84abfbdab7c3795
+
+    $ keyp get cloud_access_id
+    BMT216AF63958
+
+In your Ruby application, you can use Keyp as follows:
+
+    # get keys from the default key collection and use
+    bag = Keyp.bag
+    my_account.authenticate(bag['cloud_access_id'],bag['cloud_secret_key'])
+
+    # or update ENV
+    bag = Keyp.bag
+    Keyp::add_to_env(bag)
+
+    my_account.authenticate(ENV['cloud_access_id'],ENV['cloud_secret_key'])
+
+Keyp is not limited to just access keys. Any kind of string based name/value pair can be used.
+
+TODO: Improve description
+
+_CAVEAT:_ This gem is at a very early stage in development. Any and all functionality is subject to change.
 
 ## Installation
 
@@ -20,21 +59,42 @@ Or install it yourself as:
 
     $ gem install keyp
 
-## Usage
+## Setup
 
-TODO: Write usage instructions here
+Run the following to set up default installation
+    $ keyp init
+This will create a $HOME/.keyp directory if one does not already exist, configure this director for use with Keyp.
 
-### Setup
-
-Configure
+### Customization
 
 Keyp uses the ~/.keyp directory by default. To override, set the environment variable, KEYP_HOME to your choice
 of directory.
 
 TODO: add Bash config setting to export Keyp ENV vars to the ENV or make ENV vars accessible via Keyp hashes
 
-### Quick overview
+## Usage
 
+TODO: Write detailed usage instructions here
+
+###
+
+
+### Command line interface
+
+TODO: Write more detailed documentation, For now, see the quick start above and run the following to see CLI options
+    $ keyp --help
+
+## Development plan/Features to implement
+
+* Get basic functionality working soundly backed with effective tests
+* Implement .keyp directory setup
+* Add ENV vars to bag
+* Add bag vars to ENV
+* Incorporate with shell configuration
+* Write very clear documentation
+* Implement import/Export to YAML and/or JSON
+* Add API interfaces for other language, starting with Python
+* Consider: Add configuration options for storage (YAML,JSON, SQLITE)
 
 
 ## Contributing
