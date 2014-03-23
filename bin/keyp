@@ -53,6 +53,7 @@ end
 
 #
 # Key,value commands
+#arg_name 'keys', :multiple
 command :get do |c|
   c.action do |global_options,options,args|
   puts "--- get args= #{args}" if $debug
@@ -70,21 +71,34 @@ command :get do |c|
   end
 end
 
-# TODO: set is broken. need to tell GLI that terms after set are key value pairs with equal sign between each
-# KV pair
-# also need to implement tokenization
+# TODO: set is not optimal. Right now it only handles a single key/value pair and
+# any global or command parameters after the key=value will be sucked into the value
+# Se we'll need to implement values in quotes if the value contains whitespace
+
+arg_name 'values', :multiple
 command :set do |c|
   c.action do |global_options,options,args|
     # When/if implementing multiple key assignments
     # check args.length % 2
     # parse the args,
 
-    if args.length < 2
+    # concatenate all the args
+    # then parse on =
+    buff = ''
+    args.each do |arg|
+      buff << arg << ' '
+      buff
+    end
+
+    nvp = Keyp.parse_arg_string buff
+
+    if nvp
+      $bag[nvp[:key]] = nvp[:value]
+    else
       # puts "Usage keyp set KEY1=VALUE1 [KEY2=VALUE2 ...]"
       puts "Usage: keyp set KEY=VALUE"
-    else
-      $bag.data[args[0]] = args[1]
     end
+
     # $bag.data[]
   end
 end
@@ -97,14 +111,22 @@ command :unset do |c|
       puts 'Must specify a key to unset.'
     else
       printf "Unsetting #{args[0]}..."
-      $bag.data.delete(args[0])
-      printf "done.\n"
+      # if delete
+      val = $bag.delete(args[0])
+      if val
+        puts "unset #{args[0]}: #{val}"
+        printf "done.\n"
+      else
+        puts "key \"#{args[0]}\" not found"
+      end
+
     end
   end
 end
 
 command :list do |c|
   c.action do
+    puts "* bag:#{$bag.name}"
     $bag.data.each do |key,value|
       #printf("$s : $s\n", key,value)
       puts "#{key}: #{value}"
@@ -114,6 +136,10 @@ end
 
 post do |global_options, command, options, args|
   # if bag.data is dirty, then save
+  if $debug
+    puts "post-hook, state of bag.dirty = #{$bag.dirty}"
+  end
+  $bag.save
 
 end
 # bag management commands
