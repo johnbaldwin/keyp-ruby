@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jlbaldwin@gmail.com"]
   spec.summary       = %q{Manage environment/machine specific key/value pairs for your Ruby application.}
   spec.description   = spec.summary=
-  spec.homepage      = "https://github.com/johnbaldwin/keyp"
+  spec.homepage      = "https://github.com/johnbaldwin/keyp-ruby"
   spec.license       = "Apache v2"
 
   spec.files         = `git ls-files`.split($/)
