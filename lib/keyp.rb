@@ -25,6 +25,9 @@ module Keyp
   #  end
   #end
 
+  def self.configured?
+    Dir.exist?(KEYP_HOME)
+  end
 
   def self.setup(options ={})
 
@@ -174,7 +177,7 @@ module Keyp
       file_data = load(@keypfile)
 
       @meta = file_data[:meta]
-      @data = file_data[:data]
+      @data = file_data[:data]|| {}
       @file_hash = file_data[:file_hash]
       @dirty = false
     end
@@ -211,6 +214,10 @@ module Keyp
       val
     end
 
+    def empty?
+      @data.empty?
+    end
+
     # Give full path, attempt to load
     # sticking with YAML format for now
     # May add new file format later in which case we'll
@@ -243,7 +250,7 @@ module Keyp
       else
           raise "Keyp version x only supports YAML for config files. You tried a #{file_ext}"
       end
-      { meta: file_data['meta'], data: file_data['data'], file_hash: file_data.hash }
+      { meta: file_data['meta'], data: file_data['data']||{}, file_hash: file_data.hash }
     end
 
     # NOT thread safe
@@ -261,6 +268,13 @@ module Keyp
         begin
           file_data = { 'meta' => @meta, 'data' => @data }
 
+          if File.exist? @keypfile
+            read_file_data = load(@keypfile)
+            unless @file_hash == read_file_data[:file_hash]
+              raise "Will not write to #{@keypfile}\nHashes differ. Expected hash =#{@file_hash}\n" +
+                  "found hash #{read_file_data[:file_hash]}"
+            end
+          end
           File.open(@keypfile, 'w') do |f|
             f.write file_data.to_yaml
           end

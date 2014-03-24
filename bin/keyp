@@ -52,6 +52,13 @@ pre do |global_options, command, options, args|
   end
 
   unless command.name ==  :setup
+
+    # check if we are configured
+    unless Keyp.configured?
+      puts "Please run setup to use Keyp. Run with --help to view help menu"
+      exit 1
+    end
+
     $bag = Keyp.bag(global_options[:bag])
   else
     $bag = nil
@@ -135,10 +142,16 @@ end
 command :list do |c|
   c.action do
     puts "* bag:#{$bag.name}"
-    $bag.data.each do |key,value|
-      #printf("$s : $s\n", key,value)
-      puts "#{key}: #{value}"
+
+    unless $bag.empty?
+      $bag.data.each do |key,value|
+        #printf("$s : $s\n", key,value)
+        puts "#{key}: #{value}"
+      end
+    else
+      puts "You have an empty bag."
     end
+
   end
 end
 
@@ -157,7 +170,6 @@ post do |global_options, command, options, args|
     puts "post-hook, state of bag.dirty = #{$bag.dirty}"
   end
 
-  puts "post calling $bag.save"
   unless command.name == :setup
     $bag.save
   else

@@ -33,4 +33,7 @@ describe Keyp do
   it 'should set the dirty flag if a key is given a new value'
   it 'should not set the dirty flag if a key is assigned a value equal to its existing value'
 
+  # Braindump of tests
+  # Should show no keys if empty bag
+  # should create default.yml if .keyp already exists but default.yml does not when run from command line
 end
