@@ -25,45 +25,20 @@ module Keyp
   #  end
   #end
 
-=begin
-  # Give full path, attempt to load
-  # TODO: consider changing to class method
-  def self.load_config(config_path)
-    #config_data = {}
-    # Get extension
-    file_ext = File.extname(config_path)
-
-    # Either we are aribitrarily creating directories when
-    # given a path for a file that doesn't exist
-    # or we have special behavior for the default dir
-    # or we just fault and let the caller deal with it
-    unless File.exist? config_path
-      raise "Keyp config file not found: #{config_path}"
-    end
-
-    # check
-    # only YAML supported for initial version
-
-    # TODO: make this hardcoded case a hash of helpers
-    case file_ext
-      when '.yml'
-        config_data = YAML.load_file(config_path)
-
-      when '.json'
-        config_data = JSON.parse(File.read(config_path))
-      else
-        raise "Keyp version x only supports YAML for config files. You tried a #{file_ext}"
-    end
-    config_data || {}
-  end
-=end
-
-  def keyper(bagname, options: "options", scpe: "scope")
-    puts options
-  end
 
   def self.setup(options ={})
 
+    # check if keyp directory exists
+
+    unless Dir.exist?(KEYP_HOME)
+      puts "making directory #{KEYP_HOME}"
+      Dir.mkdir(KEYP_HOME, 0700)
+    else
+      Puts "#{KEYP_HOME} already exists"
+    end
+
+    KEYP_HOME
+=begin
     if config_path == DEFAULT_STORE
       # create the default file
 
@@ -74,7 +49,7 @@ module Keyp
     else
       raise "Non default stores not yet implemented"
     end
-
+=end
   end
 
   # NOTE: No copy method
@@ -122,6 +97,7 @@ module Keyp
     unless File.exist? filepath
       File.open(filepath, 'w') do |f|
         f.write file_data.to_yaml
+        f.chmod(0600)
       end
     else
       raise "Unable to create a new store at #{filepath}. One already exists."
@@ -192,6 +168,7 @@ module Keyp
       # not the most efficient thing, but simpler and safe enough for now
 
       unless File.exist? @keypfile
+        puts "Keuper.initialize, create_store #{@keypfile}"
         Keyp::create_store(@keypfile)
       end
       file_data = load(@keypfile)

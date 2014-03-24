@@ -19,6 +19,7 @@ bin_file = Pathname.new(__FILE__).realpath
 # http://davetron5000.github.io/gli/
 require 'gli'
 
+require 'pp'
 
 require 'keyp'
 include GLI::App
@@ -41,14 +42,21 @@ pre do |global_options, command, options, args|
   $debug = global_options[:debug]
   if $debug
     puts "pre-hook"
-    puts "command=#{command}"
+    puts "command:"
+    pp command
     puts "options:"
     puts options
     puts "args: #{args}"
     puts "args.class=#{args.class}"
     puts "---- end prehook ---"
   end
-  $bag = Keyp.bag(global_options[:bag])
+
+  unless command.name ==  :setup
+    $bag = Keyp.bag(global_options[:bag])
+  else
+    $bag = nil
+  end
+  true # hack to prevent
 end
 
 #
@@ -134,12 +142,29 @@ command :list do |c|
   end
 end
 
+
+command :setup do |c|
+  c.action do |global_options, options, args|
+    puts "keyp setup..."
+    Keyp::setup
+    $bag = Keyp::create_store 'default'
+  end
+end
+
 post do |global_options, command, options, args|
   # if bag.data is dirty, then save
   if $debug
     puts "post-hook, state of bag.dirty = #{$bag.dirty}"
   end
-  $bag.save
+
+  puts "post calling $bag.save"
+  unless command.name == :setup
+    $bag.save
+  else
+    true
+  end
+
+
 
 end
 # bag management commands

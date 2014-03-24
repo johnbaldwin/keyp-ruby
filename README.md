@@ -8,6 +8,12 @@ Web applications generally need sensitive information, like salts and keys. Mana
  application source. So I'm creating Keyp to make it simple to manage keys for your application across the development,
  testing, and production environments.
 
+## Important
+
+Keyp is still in early development and is experimental. As such it is very much a work in progress. Not all features
+expressed in the documentation may be working. The documentation may be plain wrong. I don't recommend you use Keyp
+for any kind of production code at this point in this gem's lifecycle.
+
 ## Quick Tour
 
 Keyp manages key value pairs in collections. As of version 0.0.1, Keyp refers to collections as *bags*. There is a
