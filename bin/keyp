@@ -170,6 +170,7 @@ command :create do |c|
     # TODO: add checking in case store already exists
     #Keyp::create
 
+    raise "Create not yet supported on the command line"
   end
 end
 
