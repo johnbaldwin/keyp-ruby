@@ -164,6 +164,15 @@ command :setup do |c|
   end
 end
 
+command :create do |c|
+  c.action do |global_options, options, args|
+    puts "keyp create"
+    # TODO: add checking in case store already exists
+    #Keyp::create
+
+  end
+end
+
 post do |global_options, command, options, args|
   # if bag.data is dirty, then save
   if $debug

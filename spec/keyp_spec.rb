@@ -1,29 +1,45 @@
 require 'spec_helper'
 
 describe Keyp do
-  it 'should return correct version string' do
-    #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
-    Keyp::VERSION.should == '0.0.1'
+
+  context "CONSTANTS" do
+    it 'should return correct version string' do
+      #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
+      Keyp::VERSION.should == '0.0.2'
+    end
+
+    it 'should specify default store' do
+      Keyp::DEFAULT_STORE.should == 'default'
+    end
+
+    it "should specifify default store extension" do
+      Keyp::DEFAULT_EXT.should == '.yml'
+    end
+
+    it 'should specify default keyp dir' do
+      Keyp::DEFAULT_KEYP_DIR.should == '.keyp'
+    end
   end
 
-  it 'should return correct default keyp dir' do
-  # DEFAULT_KEYP_DIRNAME = ENV['KEYP_DIRNAME'] || '.keyp'
-    Keyp::KEYP_HOME.should == File.join(ENV['HOME'], '.keyp')
+  context "Keyp directory" do
+    it 'should return correct default keyp dir' do
+      # DEFAULT_KEYP_DIRNAME = ENV['KEYP_DIRNAME'] || '.keyp'
+      Keyp::home.should == File.join(ENV['HOME'], '.keyp')
+    end
+
+    it 'should be able to override default keyp dir'
   end
 
-  it 'should specify default store' do
-    Keyp::DEFAULT_STORE.should == 'default'
-  end
-  it 'should specify default store file' do
-    Keyp::DEFAULT_STORE_FILE.should == 'default.yml'
+  context "Bag management" do
+    it 'should return default bag' do
+      keyper = Keyp::bag
+      keyper.name.should == 'default'
+    end
   end
 
-  it 'should be able to override default keyp dir'
 
-  it 'should return default bag' do
-    keyper = Keyp::bag
-    keyper.bag.should == 'default'
-  end
+
+
 
   it 'should return a key with data member'
   it 'should return a key acting as a hash'

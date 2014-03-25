@@ -13,46 +13,34 @@ module Keyp
   # Put this in initializer so testing can create its own directory and not muck
   # up the operational default
 
-
-  KEYP_HOME = File.join(ENV['HOME'], '.keyp')
   DEFAULT_STORE = 'default'
   DEFAULT_EXT = '.yml'
-  # This method sets up the keyp director
-  #def self.setup
-  #  # check if keyp directory exists. If not, set it up
-  #  unless Dir.exist?(File.join(DEFAULT_KEYP_DIRNAME))
-  #
-  #  end
-  #end
+  DEFAULT_KEYP_DIR = '.keyp'
+
+  def self.home
+    ENV['KEPY_HOME'] || File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
+  end
 
   def self.configured?
-    Dir.exist?(KEYP_HOME)
+    Dir.exist?(home)
   end
 
   def self.setup(options ={})
 
     # check if keyp directory exists
 
-    unless Dir.exist?(KEYP_HOME)
-      puts "making directory #{KEYP_HOME}"
-      Dir.mkdir(KEYP_HOME, 0700)
+    unless Dir.exist?(home)
+      puts "making directory #{home}"
+      Dir.mkdir(home, 0700)
+      if Dir.exist?(home)
+        home
+      else
+        nil
+      end
     else
-      Puts "#{KEYP_HOME} already exists"
+      Puts "#{home} already exists"
+      nil
     end
-
-    KEYP_HOME
-=begin
-    if config_path == DEFAULT_STORE
-      # create the default file
-
-      f = File.open(DEFAULT_STORE,'w')
-      #f.puts("default:")
-      f.close
-      return {}
-    else
-      raise "Non default stores not yet implemented"
-    end
-=end
   end
 
   # NOTE: No copy method
@@ -86,7 +74,7 @@ module Keyp
   end
 
   def self.create_store(name, options = {} )
-    filepath = File.join(KEYP_HOME, name + DEFAULT_EXT)
+    filepath = File.join(home, name + DEFAULT_EXT)
 
     time_now = Time.now.utc.iso8601
     file_data = {}
@@ -147,8 +135,8 @@ module Keyp
     attr_reader :keypdir, :dirty
     attr_accessor :name, :data, :file_hash
 
-    def config_path
-      File.join(@keypdir, @name)
+    def keypfile
+      File.join(@keypdir, @name+@ext)
     end
 
     # We expect
@@ -161,20 +149,20 @@ module Keyp
       end
         # set attributes not set by params
 
-      @keypdir ||= Keyp::KEYP_HOME
+      @keypdir ||= Keyp::home
       @read_only ||= false
       @ext ||= '.yml'
-      @keypfile = config_path+@ext
+      #@keypfile = config_path
       # load our resource
 
       # load config file into hashes
       # not the most efficient thing, but simpler and safe enough for now
 
-      unless File.exist? @keypfile
-        puts "Keuper.initialize, create_store #{@keypfile}"
-        Keyp::create_store(@keypfile)
+      unless File.exist? keypfile
+        puts "Keyper.initialize, create_store #{keypfile}"
+        Keyp::create_store(name)
       end
-      file_data = load(@keypfile)
+      file_data = load(keypfile)
 
       @meta = file_data[:meta]
       @data = file_data[:data]|| {}
@@ -268,14 +256,14 @@ module Keyp
         begin
           file_data = { 'meta' => @meta, 'data' => @data }
 
-          if File.exist? @keypfile
-            read_file_data = load(@keypfile)
+          if File.exist? keypfile
+            read_file_data = load(keypfile)
             unless @file_hash == read_file_data[:file_hash]
-              raise "Will not write to #{@keypfile}\nHashes differ. Expected hash =#{@file_hash}\n" +
+              raise "Will not write to #{keypfile}\nHashes differ. Expected hash =#{@file_hash}\n" +
                   "found hash #{read_file_data[:file_hash]}"
             end
           end
-          File.open(@keypfile, 'w') do |f|
+          File.open(keypfile, 'w') do |f|
             f.write file_data.to_yaml
           end
           @dirty = false
