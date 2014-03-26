@@ -35,6 +35,18 @@ describe Keyp do
       keyper = Keyp::bag
       keyper.name.should == 'default'
     end
+
+    it "should say a bag exists" do
+      # get the default bag, should create it if it doesn't exist
+      keyper = Keyp::bag
+      Keyp.exist?(keyper.name).should == true
+    end
+
+    it "should say a bag does not exist" do
+      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M")}"
+      Keyp.exist?(bag_name).should_not == true
+    end
+
   end
 
 

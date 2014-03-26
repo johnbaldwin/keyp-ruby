@@ -14,11 +14,16 @@ module Keyp
   # up the operational default
 
   DEFAULT_STORE = 'default'
+
   DEFAULT_EXT = '.yml'
   DEFAULT_KEYP_DIR = '.keyp'
 
   def self.home
     ENV['KEPY_HOME'] || File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
+  end
+
+  def self.ext
+    DEFAULT_EXT
   end
 
   def self.configured?
@@ -65,6 +70,11 @@ module Keyp
     keyper
   end
 
+  # Tells if a bag already exists for the keyp dir identified by the environment
+  def self.exist?(name)
+    path = File.join(home,name+ext)
+    File.exist? path
+  end
 
   def self.add_to_env(bag)
     # TODO: Add checking, upcase
@@ -151,7 +161,7 @@ module Keyp
 
       @keypdir ||= Keyp::home
       @read_only ||= false
-      @ext ||= '.yml'
+      @ext ||= Keyp::DEFAULT_EXT
       #@keypfile = config_path
       # load our resource
 
