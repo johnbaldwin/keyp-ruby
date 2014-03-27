@@ -1,35 +1,88 @@
-require "keyp/version"
+require 'keyp/version'
+require 'keyp/bag'
 require 'json'
 require 'yaml'
 
+##
+# This is the main module for the Keyp library
 #
-# TODO: build out cli.rb to trim the exe script, keyp to its bare minimum
+# = Overview
+#
+#
+# Keyp is not yet supported on Windows
+#
+# = Developer notes
+#
+# NOTE: Do not implement a copy method to explicitly copy one bag to another.
+# This is too prone to undesired overwriting.
+# Instead, use create and pass in the other bag as a named parameter. This way
+# we express
 #
 module Keyp
-  # Your code goes here...
+
+  # TODO: Revisit constants. Make a submodule for constants
+
+
+  ##
+  # Constant definitions
+
+  # Save the original environment before this module instantiates
   ORIGINAL_ENV = ENV.to_hash
 
-  # TODO:
-  # Put this in initializer so testing can create its own directory and not muck
-  # up the operational default
+  # This constant sets the default bag when one is not specified in methods that need to
+  # identify the bag
+  DEFAULT_BAG = 'default'
 
-  DEFAULT_STORE = 'default'
-
+  # Default file extension for the bags
   DEFAULT_EXT = '.yml'
+
+  DEFAULT_KEYP_DIR_PERMISSIONS = 0700
+  # Default home directory that keyp uses to store bags
   DEFAULT_KEYP_DIR = '.keyp'
 
+  # Returns the directory used by Keyp to store the key bags
+  #
+  # By default, Keyp uses +$HOME/.keyp+ and sets permissions to 0700 to the +.keyp+ directory
+  #
+  # == Environment variable overrides
+  #
+  # You can override the default Keyp location by defining +KEYP_HOME+
+  #
+  # Keyp is currently designed to have a _per user_ configuration, but you should be able to
+  # set it up for system wide use if you desire.
+
+  # === Example
+  # +export KEYP_HOME=/var/lib/keyp+
+  #
+  # *Security note* If you do this *and* you are storing sensitive information, then
+  # it is recommended you restrict permissions
+  #
   def self.home
     ENV['KEPY_HOME'] || File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
   end
 
+  ##
+  #
+  # Returns the file extension that Keyp uses for bags
+  # Should return '.yml'
+  #
   def self.ext
     DEFAULT_EXT
   end
 
+  ##
+  # Returns +true+ if the Keyp home diretory exists and is readable and writeable by the user
+  # running Keyp
   def self.configured?
-    Dir.exist?(home)
+    Dir.exist?(home) && File.executable?(home) &&
+        File.readable_real?(home) && File.writable_real?(home)
   end
 
+  ##
+  # Creates the Keyp home directory and sets permissions if the directory does not exist
+  # See method +Keyp::home+
+  # === Options
+  # Not options yet
   def self.setup(options ={})
 
     # check if keyp directory exists
@@ -48,22 +101,6 @@ module Keyp
     end
   end
 
-  # NOTE: No copy method
-  # No method to explicitly copy one bag to another
-  # Too prone to unwanted overwriting
-  # Instead, use create and pass in the other bag as a
-  # named parameter
-
-  # create a new bag persist
-  # TODO: check options for a has to write to the bag
-  def self.create(bag, options={})
-    # two root sections in a bag
-    # meta:
-    #   meta will contain information for use by keyp about this particular bag
-    #   such as encoding rules, case sensitivity
-    # data:
-  end
-
   # Convenience method to create a new Bag
   def self.bag(name='default', options = {})
     keyper = Keyper.new(name, options)
@@ -72,8 +109,12 @@ module Keyp
 
   # Tells if a bag already exists for the keyp dir identified by the environment
   def self.exist?(name)
-    path = File.join(home,name+ext)
+    path = bag_path(name)
     File.exist? path
+  end
+
+  def self.bag_path(name)
+    path = File.join(home,name+ext)
   end
 
   def self.add_to_env(bag)
@@ -83,9 +124,7 @@ module Keyp
     end
   end
 
-  def self.create_store(name, options = {} )
-    filepath = File.join(home, name + DEFAULT_EXT)
-
+  def self.create_bag(name, options = {} )
     time_now = Time.now.utc.iso8601
     file_data = {}
     file_data['meta'] = {
@@ -95,8 +134,8 @@ module Keyp
       'updated_at' => time_now
     }
     file_data['data'] = nil
-    unless File.exist? filepath
-      File.open(filepath, 'w') do |f|
+    unless exist? name
+      File.open(bag_path(name), 'w') do |f|
         f.write file_data.to_yaml
         f.chmod(0600)
       end

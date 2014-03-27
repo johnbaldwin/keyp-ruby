@@ -170,9 +170,21 @@ command :create do |c|
     # TODO: add checking in case store already exists
     #Keyp::create
 
-    raise "Create not yet supported on the command line"
+    bag = Keyp.create_bag(args[0])
+    if bag
+      puts "created Keyp bag #{bag.name}"
+    else
+      puts "Unable to create Keyp bag #{args[0]}"
+    end
   end
 end
+
+command :delete do |c|
+  c.action do |global_options, options, args|
+    puts "delete bag is not supported at this time"
+  end
+end
+
 
 post do |global_options, command, options, args|
   # if bag.data is dirty, then save
@@ -185,10 +197,8 @@ post do |global_options, command, options, args|
   else
     true
   end
-
-
-
 end
+
 # bag management commands
 
 # create a bag

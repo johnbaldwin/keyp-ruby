@@ -9,7 +9,7 @@ describe Keyp do
     end
 
     it 'should specify default store' do
-      Keyp::DEFAULT_STORE.should == 'default'
+      Keyp::DEFAULT_BAG.should == 'default'
     end
 
     it "should specifify default store extension" do
@@ -48,9 +48,6 @@ describe Keyp do
     end
 
   end
-
-
-
 
 
   it 'should return a key with data member'
