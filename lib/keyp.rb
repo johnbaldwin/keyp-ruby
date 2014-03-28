@@ -36,9 +36,14 @@ module Keyp
   # Default file extension for the bags
   DEFAULT_EXT = '.yml'
 
+  # Permissions for the KEYP_HOME directory
   DEFAULT_KEYP_DIR_PERMISSIONS = 0700
+
   # Default home directory that keyp uses to store bags
   DEFAULT_KEYP_DIR = '.keyp'
+
+  #TODO: set this
+  #ENV_VAR_NAME_REGEX =
 
   # Returns the directory used by Keyp to store the key bags
   #
@@ -101,27 +106,33 @@ module Keyp
     end
   end
 
+  ##
   # Convenience method to create a new Bag
+  #
+  # ==== Parameters
+  #
+  # * +name+ - bag name. 'default' is used if no bag name is provided
+  # * +options+ - options are passed through to Bag.new
+  #
   def self.bag(name='default', options = {})
-    keyper = Keyper.new(name, options)
-    keyper
+    bag = Keyper.new(name, options)
+    bag
   end
 
+  ##
   # Tells if a bag already exists for the keyp dir identified by the environment
+  #
   def self.exist?(name)
     path = bag_path(name)
     File.exist? path
   end
 
+  ##
+  # returns the absolute path for the given bag
+  #
+  #
   def self.bag_path(name)
     path = File.join(home,name+ext)
-  end
-
-  def self.add_to_env(bag)
-    # TODO: Add checking, upcase
-    bag.data.each do |key,value|
-      ENV[key] = value
-    end
   end
 
   def self.create_bag(name, options = {} )
@@ -167,6 +178,12 @@ module Keyp
     nvp
   end
 
+  # ---------------------------------------------
+  # Experimental stuff
+
+  def self.set_sys_env(key, value)
+
+  end
 
   # ----------------------------------------------
 
@@ -208,8 +225,8 @@ module Keyp
       # not the most efficient thing, but simpler and safe enough for now
 
       unless File.exist? keypfile
-        puts "Keyper.initialize, create_store #{keypfile}"
-        Keyp::create_store(name)
+        puts "Keyper.initialize, create_bag #{keypfile}"
+        Keyp::create_bag(name)
       end
       file_data = load(keypfile)
 
@@ -235,7 +252,7 @@ module Keyp
         @data[key] = value
         @dirty = true
       else
-        raise "Keyper #{@name} is read only"
+        raise "Bag #{@name} is read only"
       end
     end
 
@@ -255,6 +272,67 @@ module Keyp
       @data.empty?
     end
 
+
+    ##
+    # Adds key/value pairs from this bag to ENV
+    # NOTE: Currently in development. Only assigns vars if the key is a valid
+    # environment variable name
+    # If no options are provided, then all of the bag's key/value pairs will be assigned.
+    #
+    # ==== Options
+    # TBD:
+    #  +:sysvar+ Only use valid system environment vars
+    #  +:selection+ Provide a list of keys to match
+    #  +:overwrite+
+    #  +:no_overwrite+  - This is enabled by default
+    #  +:to_upper
+
+    # Returns a hash of the key/value pairs which have been set
+    # ==== Examples
+    # +add_to_env upper:+
+    # To assign keys matching a pattern:
+    # +add_to_env regex: '\A(_|[A-Z])[a-zA-Z\d]*'
+
+    def add_to_env(options = {})
+      # TODO: Add checking, upcase
+
+      # pattern matching valid env var
+      #reg = /\A(_|[A-Z])[a-zA-Z\d]*/
+      sys_env_reg = /\A(_|[a-zA-Z])\w*/
+      assigned = {}
+      overwrite = options[:overwrite] || false
+      pattern = options[:sysvar] if options.key?(:sysvar)
+
+      pattern ||= '(...)'
+
+      bag.data.each do |key,value|
+        if pattern.match(key)
+          # TODO: add overwrite checking
+          ENV[key] = value
+          assigned[key] = value
+        end
+      end
+      assigned
+    end
+
+
+    # TODO add from hash
+
+
+    def import(filename)
+      raise "import not yet supported"
+    end
+
+    def export(filename)
+      raise "export not yet supported"
+    end
+
+
+    # TODO: def to_yaml
+    # TODO: def to_json
+    # TODO: def to_s
+
+    ##
     # Give full path, attempt to load
     # sticking with YAML format for now
     # May add new file format later in which case we'll
@@ -272,7 +350,7 @@ module Keyp
       # TODO: make this hardcoded case a hash of helpers
       # TODO: Add two sections: Meta and data, then return as hash
 
-      if file_ext.downcase == '.yml'
+      if file_ext.downcase == Keyp::DEFAULT_EXT
 
         # Either we are arbitrarily creating directories when
         # given a path for a file that doesn't exist
@@ -290,6 +368,9 @@ module Keyp
       { meta: file_data['meta'], data: file_data['data']||{}, file_hash: file_data.hash }
     end
 
+    ##
+    # Saves the Bag to file
+    #
     # NOT thread safe
     # TODO: make thread safe
     def save

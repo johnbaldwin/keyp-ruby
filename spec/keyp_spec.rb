@@ -43,6 +43,7 @@ describe Keyp do
     end
 
     it "should say a bag does not exist" do
+      # TODO: add bag name generation to a helper
       bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M")}"
       Keyp.exist?(bag_name).should_not == true
     end
