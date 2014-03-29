@@ -135,6 +135,30 @@ module Keyp
     path = File.join(home,name+ext)
   end
 
+  ##
+  # Returns an array of bag names
+  # This method returns a list of bag names for the active Keyp repository
+  # The default repository is $HOME/.keyp
+  # If the environment variable, KEYP_HOME is set, this directory will be used.
+  def self.bag_names(options = {})
+    #TODO: enable pattern matching
+    bags = []
+    reg = Regexp.new('\\'+ext+'$')
+    puts  reg
+    dir = Dir.new(home)
+    dir.each do |f|
+      # Filter for only
+      #if /\.yml$/.match(f)
+      if reg.match(f)
+        bags << File.basename(f,ext)
+      end
+    end
+    bags
+  end
+
+  ##
+  # Creates a new bag if one does not already exist with the given name
+  #
   def self.create_bag(name, options = {} )
     time_now = Time.now.utc.iso8601
     file_data = {}
@@ -154,6 +178,19 @@ module Keyp
       raise "Unable to create a new store at #{filepath}. One already exists."
     end
     bag name
+  end
+
+  ##
+  # Deletes the bag matching the name
+  # Returns true if successful, false if not
+  def self.delete_bag(name, options = {})
+    if exist? name
+      # TODO: add exception handling
+      numfiles = File.delete(bag_path(name))
+      true
+    else
+      false
+    end
   end
 
   def self.parse_arg_string(arg_string, options={})
@@ -274,9 +311,8 @@ module Keyp
 
 
     ##
-    # Adds key/value pairs from this bag to ENV
-    # NOTE: Currently in development. Only assigns vars if the key is a valid
-    # environment variable name
+    # Adds key/value pairs from this bag to the Ruby ENV
+    # NOTE: Currently in development.
     # If no options are provided, then all of the bag's key/value pairs will be assigned.
     #
     # ==== Options
@@ -297,7 +333,6 @@ module Keyp
       # TODO: Add checking, upcase
 
       # pattern matching valid env var
-      #reg = /\A(_|[A-Z])[a-zA-Z\d]*/
       sys_env_reg = /\A(_|[a-zA-Z])\w*/
       assigned = {}
       overwrite = options[:overwrite] || false
