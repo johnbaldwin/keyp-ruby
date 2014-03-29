@@ -79,9 +79,9 @@ long_desc 'Shows the value for the supplied key'
 # Key,value commands
 #arg_name 'keys', :multiple
 command :get do |c|
-  c.desc 'Shows the value for the supplied key. (2)'
+  c.desc 'Shows the value for the supplied key.'
 
-  c.switch [:v,:value]
+  #c.switch [:v,:value]
   c.action do |global_options,options,args|
 
     #unless options[:value]
@@ -104,8 +104,12 @@ end
 # any global or command parameters after the key=value will be sucked into the value
 # Se we'll need to implement values in quotes if the value contains whitespace
 
+desc 'set the value for the supplied key'
+long_desc 'Sets the value for the supplied key. If the key exists, the value will be overwritten'
+
 arg_name 'values', :multiple
 command :set do |c|
+  c.desc 'Set the value for the supplied key. If the key exists, the value will be overwritten'
   c.action do |global_options,options,args|
     # When/if implementing multiple key assignments
     # check args.length % 2
@@ -123,7 +127,7 @@ command :set do |c|
 
     if nvp
       $bag[nvp[:key]] = nvp[:value]
-    else
+    elsif global_options[:suppress] == false
       # puts "Usage keyp set KEY1=VALUE1 [KEY2=VALUE2 ...]"
       puts "Usage: keyp set KEY=VALUE"
     end
@@ -132,6 +136,7 @@ command :set do |c|
   end
 end
 
+desc 'removes the key and value for the supplied key'
 command :unset do |c|
   c.action do |global_options,options, args|
     if args.length == 0
@@ -153,7 +158,7 @@ command :unset do |c|
   end
 end
 
-
+desc 'lists all the key:value pairs in the bag.'
 command :list do |c|
   c.action do |global_options, options, args|
 

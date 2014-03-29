@@ -144,7 +144,6 @@ module Keyp
     #TODO: enable pattern matching
     bags = []
     reg = Regexp.new('\\'+ext+'$')
-    puts  reg
     dir = Dir.new(home)
     dir.each do |f|
       # Filter for only
