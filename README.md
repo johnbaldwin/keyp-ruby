@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/keyp.png)](http://badge.fury.io/rb/keyp)
+
 # Keyp
 
 Keyp is an executable Ruby gem that manages user/machine specific key/value pairs for your Ruby application.
