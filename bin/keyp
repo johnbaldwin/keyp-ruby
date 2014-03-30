@@ -84,9 +84,8 @@ command :get do |c|
   #c.switch [:v,:value]
   c.action do |global_options,options,args|
 
-    #unless options[:value]
-      puts "--- get args= #{args}" if $debug
-    if args.length == 0 && !global_options[:suppress]
+    #help_now!('key is required') if args.empty?
+    if args.empty? && !global_options[:suppress]
       puts "Usage: keyp get KEY"
       puts "Must specify a key."
     else
@@ -179,7 +178,11 @@ command :list do |c|
 end
 
 
+setup_desc = 'Creates and configures the Keyp directory'
+
+desc setup_desc
 command :setup do |c|
+  c.desc setup_desc
   c.action do |global_options, options, args|
     puts "keyp setup..."
     Keyp::setup
@@ -188,6 +191,7 @@ command :setup do |c|
 end
 
 command :create do |c|
+
   c.action do |global_options, options, args|
     puts "keyp create"
     # TODO: add checking in case store already exists
