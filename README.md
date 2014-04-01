@@ -18,7 +18,7 @@ for any kind of production code at this point in this gem's lifecycle.
 
 ## Quick Tour
 
-Keyp manages key value pairs in collections. As of version 0.0.1, Keyp refers to collections as *bags*. There is a
+Keyp manages key value pairs in collections. As of version 0.0.4, Keyp refers to collections as *bags*. There is a
 default bag called *default*. Unless you specify a bag name, *default* will be used.
 
 Here are some command line examples showing some basic Keyp functionality using the default bag. Here we set a couple
@@ -91,6 +91,10 @@ TODO: Write detailed usage instructions here
 
 TODO: Write more detailed documentation, For now, see the quick start above and run the following to see CLI options
     $ keyp --help
+
+## Release Notes
+
+* v 0.0.4 - Fixed missing file error
 
 ## Development plan/Features to implement
 
