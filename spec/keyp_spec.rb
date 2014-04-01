@@ -5,7 +5,7 @@ describe Keyp do
   context "CONSTANTS" do
     it 'should return correct version string' do
       #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
-      Keyp::VERSION.should == '0.0.4'
+      Keyp::VERSION.should == '0.0.5'
     end
 
     it 'should specify default store' do
