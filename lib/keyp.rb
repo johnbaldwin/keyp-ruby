@@ -2,6 +2,7 @@ require 'keyp/version'
 require 'keyp/bag'
 require 'json'
 require 'yaml'
+require 'time'
 
 ##
 # This is the main module for the Keyp library

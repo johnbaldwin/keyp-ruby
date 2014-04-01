@@ -15,13 +15,21 @@ module Keyp
     attr_reader :keypdir, :dirty
     attr_accessor :name, :data, :file_hash
 
+    ##
+    # Returns the full path of this Bag's file
     def keypfile
       File.join(@keypdir, @name+@ext)
     end
 
-    # We expect
-    # I'm not happy with how creating instance variables works. There must be a cleaner way
+    ##
+    # Object initializer
+    #
+    # === options
+    # +keypdir+
+    # +read_only+
+    # +ext+
     def initialize(name, options = {})
+      # I'm not happy with how creating instance variables works. There must be a cleaner way
       @name = name
       options.each do |k,v|
         puts "processing options #{k} = #{v}"
@@ -50,14 +58,21 @@ module Keyp
       @dirty = false
     end
 
+    ##
+    #
     def [](key)
       @data[key]
     end
 
+    ##
+    #
     def []=(key, value)
       set_prop(key, value)
     end
 
+    ##
+    # Sets a key:value pair
+    # NOTE: This may be made protected
     def set_prop(key, value)
       unless @read_only
         # TODO: check if data has been modified
@@ -70,6 +85,8 @@ module Keyp
       end
     end
 
+    ##
+    # Deletes the key:value pair from this bag for the given key
     def delete(key)
       unless @read_only
         if @data.key? key
@@ -82,6 +99,8 @@ module Keyp
       val
     end
 
+    ##
+    # Returns true if there are no key:value pairs, false if there are any
     def empty?
       @data.empty?
     end
@@ -98,7 +117,7 @@ module Keyp
     #  +:selection+ Provide a list of keys to match
     #  +:overwrite+
     #  +:no_overwrite+  - This is enabled by default
-    #  +:to_upper
+    #  +:to_upper+
 
     # Returns a hash of the key/value pairs which have been set
     # ==== Examples
