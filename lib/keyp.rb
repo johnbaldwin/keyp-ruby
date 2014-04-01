@@ -115,7 +115,7 @@ module Keyp
   # * +options+ - options are passed through to Bag.new
   #
   def self.bag(name='default', options = {})
-    bag = Keyper.new(name, options)
+    bag = Bag.new(name, options)
     bag
   end
 

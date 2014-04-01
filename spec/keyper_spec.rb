@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Keyp::Keyper do
+describe Keyp::Bag do
 
   context "is empty" do
     before (:each) do
       puts "before : is empty"
-      @bag = Keyp::Keyper.new 'testing123'
+      @bag = Keyp::Bag.new 'testing123'
     end
 
     it "should return an empty hash" do
@@ -20,7 +20,7 @@ describe Keyp::Keyper do
   context "is not empty" do
     before (:each) do
       puts "before : is not empty"
-      @bag = Keyp::Keyper.new 'grue_eats_you'
+      @bag = Keyp::Bag.new 'grue_eats_you'
       @bag['LIGHTS'] = 'out'
     end
     it "should return a non-empty hash" do
@@ -32,7 +32,7 @@ describe Keyp::Keyper do
     before (:each) do
       # TODO: pseudo random bag name generation to a helper
       bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M")}"
-      @bag = Keyp::Keyper.new bag_name
+      @bag = Keyp::Bag.new bag_name
     end
     it "should copy all vars"
 =begin

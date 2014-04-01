@@ -10,7 +10,7 @@ module Keyp
   # TODO: move to own file, rename to "Bag"
   # TODO: i18n error messages
   #
-  class Keyper
+  class Bag
 
     attr_reader :keypdir, :dirty
     attr_accessor :name, :data, :file_hash
