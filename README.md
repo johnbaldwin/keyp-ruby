@@ -93,7 +93,7 @@ TODO: Write more detailed documentation, For now, see the quick start above and 
     $ keyp --help
 
 ## Release Notes
-
+* v 0.0.5 - Fixed iso8601 error
 * v 0.0.4 - Fixed missing file error
 
 ## Development plan/Features to implement
