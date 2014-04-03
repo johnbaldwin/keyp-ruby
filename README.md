@@ -18,6 +18,8 @@ for any kind of production code at this point in this gem's lifecycle.
 
 ## Quick Tour
 
+To install, see "Installation" below
+
 Keyp manages key value pairs in collections. As of version 0.0.4, Keyp refers to collections as *bags*. There is a
 default bag called *default*. Unless you specify a bag name, *default* will be used.
 
@@ -93,6 +95,7 @@ TODO: Write more detailed documentation, For now, see the quick start above and 
     $ keyp --help
 
 ## Release Notes
+* v 0.0.6 - Added copying key:values to the Ruby ENV in the library (still have to implement in the CLI)
 * v 0.0.5 - Fixed iso8601 error
 * v 0.0.4 - Fixed missing file error
 
