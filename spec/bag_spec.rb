@@ -23,6 +23,7 @@ describe Keyp::Bag do
       @bag = Keyp::Bag.new 'grue_eats_you'
       @bag['LIGHTS'] = 'out'
     end
+
     it "should return a non-empty hash" do
       @bag.data.size.should > 0
     end
@@ -31,12 +32,10 @@ describe Keyp::Bag do
   context "environment variables" do
     before (:each) do
       # TODO: pseudo random bag name generation to a helper
-      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M")}"
+      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
       @bag = Keyp::Bag.new bag_name
     end
-    it "should copy all vars"
-=begin
-    do
+    it "should copy all vars"  do
       testvars = {
           'ALPHA' => 'First in the phonetic alphabet',
           'BRAVO' => 'Second in the phonetic alphabet',
@@ -45,12 +44,58 @@ describe Keyp::Bag do
 
       testvars.each { |key, value| @bag[key] = value }
 
-      @bag.add_to_env
+      added = @bag.add_to_env
       testvars.each do |key, value|
         ENV[key].should_not == nil
         ENV[key].should == value
       end
     end
-=end
   end
+
+  context "bag state" do
+
+    before (:each) do
+      # TODO: pseudo random bag name generation to a helper
+      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
+      @bag = Keyp::Bag.new bag_name
+    end
+
+    it 'should not set the dirty flag when no items are in the bag' do
+      @bag.empty?.should == true
+      @bag.dirty.should == false
+    end
+
+    it 'should set the dirty flag if a new key is created' do
+      @bag['KEY1'] = 'value1'
+      @bag.empty?.should == false
+      @bag.dirty.should == true
+
+    end
+
+    it 'should not set the dirty flag after save' do
+      @bag.empty?.should == true
+      @bag['KEY1'] = 'value1'
+      @bag.save
+      @bag.dirty.should == false
+    end
+    it 'should set the dirty flag if a key is given a new value' do
+      @bag.empty?.should == true
+      @bag['KEY1'] = 'value1'
+      @bag.dirty.should == true
+    end
+
+    it 'should not set the dirty flag if a key is assigned a value equal to its existing value' do
+      @bag.empty?.should == true
+      @bag['KEY1'] = 'value1'
+      @bag.save
+      @bag.dirty.should == false
+      @bag['KEY1'] = 'value1'
+      @bag.dirty.should == false
+    end
+  end
+
+  it 'should return a key with data member'
+  it 'should return a key acting as a hash'
+  it 'should allow assigning a key if not read only'
+  it 'should not allow assigning a key if read only'
 end

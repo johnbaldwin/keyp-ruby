@@ -47,7 +47,7 @@ module Keyp
       # not the most efficient thing, but simpler and safe enough for now
 
       unless File.exist? keypfile
-        puts "Keyper.initialize, create_bag #{keypfile}"
+        puts "Bag.initialize, create_bag #{keypfile}"
         Keyp::create_bag(name)
       end
       file_data = load(keypfile)
@@ -78,8 +78,10 @@ module Keyp
         # TODO: check if data has been modified
         # maybe there is a way hash tells us its been modified. If not then
         # just check if key,val is already in hash and matches
-        @data[key] = value
-        @dirty = true
+        unless @data.key?(key) && @data[key] == value
+          @data[key] = value
+          @dirty = true
+        end
       else
         raise "Bag #{@name} is read only"
       end
@@ -134,9 +136,8 @@ module Keyp
       overwrite = options[:overwrite] || false
       pattern = options[:sysvar] if options.key?(:sysvar)
 
-      pattern ||= '(...)'
-
-      bag.data.each do |key,value|
+      pattern ||= /(...)/
+      @data.each do |key,value|
         if pattern.match(key)
           # TODO: add overwrite checking
           ENV[key] = value

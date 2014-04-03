@@ -5,7 +5,7 @@ describe Keyp do
   context "CONSTANTS" do
     it 'should return correct version string' do
       #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
-      Keyp::VERSION.should == '0.0.5'
+      Keyp::VERSION.should == '0.0.6'
     end
 
     it 'should specify default store' do
@@ -44,20 +44,14 @@ describe Keyp do
 
     it "should say a bag does not exist" do
       # TODO: add bag name generation to a helper
-      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M")}"
+      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
       Keyp.exist?(bag_name).should_not == true
     end
 
   end
 
 
-  it 'should return a key with data member'
-  it 'should return a key acting as a hash'
-  it 'should allow assigning a key if not read only'
-  it 'should not allow assigning a key if read only'
-  it 'should set the dirty flag if a new key is created'
-  it 'should set the dirty flag if a key is given a new value'
-  it 'should not set the dirty flag if a key is assigned a value equal to its existing value'
+
 
   # Braindump of tests
   # Should show no keys if empty bag
