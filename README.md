@@ -53,7 +53,8 @@ Keyp is not limited to just access keys. Any kind of string based name/value pai
 
 TODO: Improve description
 
-_CAVEAT:_ This gem is at a very early stage in development. Any and all functionality is subject to change.
+_CAVEAT:_ This gem is at an early stage in development. Functionality is 
+subject to change depending on need and clarity.
 
 ## Installation
 
@@ -95,16 +96,14 @@ TODO: Write more detailed documentation, For now, see the quick start above and 
     $ keyp --help
 
 ## Release Notes
+* v 0.0.7 - Added loading a bag from the ENV. fixed error with keys of lett than three characters.
 * v 0.0.6 - Added copying key:values to the Ruby ENV in the library (still have to implement in the CLI)
 * v 0.0.5 - Fixed iso8601 error
 * v 0.0.4 - Fixed missing file error
 
 ## Development plan/Features to implement
 
-* Get basic functionality working soundly backed with effective tests
-* Implement .keyp directory setup
-* Add ENV vars to bag
-* Add bag vars to ENV
+* Fill out rspec tests 
 * Incorporate with shell configuration
 * Write very clear documentation
 * Implement import/Export to YAML and/or JSON

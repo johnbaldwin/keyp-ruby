@@ -9,6 +9,7 @@ module Keyp
   #
   # TODO: move to own file, rename to "Bag"
   # TODO: i18n error messages
+  # TODO: handle symbol to string and back for keys. Need instance setting to handle validating keys as symbols
   #
   class Bag
 
@@ -107,6 +108,9 @@ module Keyp
       @data.empty?
     end
 
+    def key?(key)
+      @data.key?(key)
+    end
 
     ##
     # Adds key/value pairs from this bag to the Ruby ENV
@@ -136,7 +140,7 @@ module Keyp
       overwrite = options[:overwrite] || false
       pattern = options[:sysvar] if options.key?(:sysvar)
 
-      pattern ||= /(...)/
+      pattern ||= /(..*)/
       @data.each do |key,value|
         if pattern.match(key)
           # TODO: add overwrite checking
@@ -147,6 +151,29 @@ module Keyp
       assigned
     end
 
+    ##
+    # load environment variables into this bag
+    # === Options
+    # +:pattern+ Applies keys matching this pattern
+    # +:overwrite+ true to overwrite existing keys, false (default) to not overwrite existing keys
+    #
+    #
+    def load_from_env(options = {})
+      assigned = {}
+      overwrite = options[:overwrite] || false
+      pattern = options[:pattern] || /(..*)/
+      ENV.each do | key, value|
+        if pattern.match(key)
+          unless overwrite && @data.key?(key)
+            @data[key] = value
+            assigned[key] = value
+          end
+        else
+          puts "load_from_env. No match for #{key}"
+        end
+      end
+      assigned
+    end
 
     # TODO add from hash
 

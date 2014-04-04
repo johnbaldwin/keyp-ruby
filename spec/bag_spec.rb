@@ -39,7 +39,10 @@ describe Keyp::Bag do
       testvars = {
           'ALPHA' => 'First in the phonetic alphabet',
           'BRAVO' => 'Second in the phonetic alphabet',
-          'CHARLIE' => 'Third in the phonetic alphabet'
+          'CHARLIE' => 'Third in the phonetic alphabet',
+          '_' => 'a single underscore',
+          'a' => 'first letter in the alphabet',
+          'bb' => 'two of the second letter in the alphabet'
       }
 
       testvars.each { |key, value| @bag[key] = value }
@@ -50,6 +53,29 @@ describe Keyp::Bag do
         ENV[key].should == value
       end
     end
+
+    it "should receive all vars" do
+      test_keyvals = {
+        'foo' => 'bar',
+        'biz' => 'baz',
+        'GRUE' => 'Eats you in the dark',
+        'a' => 'first letter in the alphabet',
+        'bb' => 'two of the second letter in the alphabet'
+      }
+
+      test_keyvals.each do |key,value|
+        ENV[key] = value
+      end
+      @bag.load_from_env
+      ENV.each do |key,value|
+        puts "testing key=#{key}"
+        @bag.key?(key).should == true
+        @bag[key].should == value
+      end
+    end
+
+    it "should not overwrite existing keys"
+    it "should match filtering pattern"
   end
 
   context "bag state" do
