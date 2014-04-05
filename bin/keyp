@@ -125,7 +125,7 @@ command :set do |c|
     nvp = Keyp.parse_arg_string buff
 
     if nvp
-      $bag[nvp[:key]] = nvp[:value]
+      $bag[nvp[:key]] = nvp[:value].strip
     elsif global_options[:suppress] == false
       # puts "Usage keyp set KEY1=VALUE1 [KEY2=VALUE2 ...]"
       puts "Usage: keyp set KEY=VALUE"
