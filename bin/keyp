@@ -42,6 +42,11 @@ switch [:d, :debug]
 desc 'Suppress hints: If invalid parameters are set, no suggestive feedback will be provided'
 switch [:s, :suppress]
 
+
+
+version Keyp::VERSION
+
+
 # TODO: fix this because this implies that we either already have a bag or it will create a new one
 pre do |global_options, command, options, args|
   # initialize our store
@@ -190,8 +195,11 @@ command :setup do |c|
   end
 end
 
-command :create do |c|
+create_desc = 'Creates a new bag'
 
+desc create_desc
+command :create do |c|
+  c.desc create_desc
   c.action do |global_options, options, args|
     puts "keyp create"
     # TODO: add checking in case store already exists
@@ -206,7 +214,10 @@ command :create do |c|
   end
 end
 
+delete_desc = 'Deletes an existing bag'
+desc delete_desc
 command :delete do |c|
+  c.desc delete_desc
   c.action do |global_options, options, args|
     puts "delete bag is not supported at this time"
     # TODO: prompt for verification
