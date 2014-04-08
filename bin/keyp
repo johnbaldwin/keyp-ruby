@@ -224,7 +224,10 @@ command :delete do |c|
   end
 end
 
+show_desc = 'Lists all the bags in Keyp'
+desc show_desc
 command :show do |c|
+  c.desc show_desc
   c.action do |global_options, options, args|
     # TODO: implement filtering, stats (like number of items in a bag, last updated, etc)
     # and just filename
