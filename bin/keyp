@@ -62,8 +62,7 @@ pre do |global_options, command, options, args|
     puts "---- end prehook ---"
   end
 
-  unless command.name ==  :setup
-
+  unless [:setup, :show, :delete].include? command.name
     # check if we are configured
     unless Keyp.configured?
       puts "Please run setup to use Keyp. Run with --help to view help menu"
@@ -219,8 +218,38 @@ desc delete_desc
 command :delete do |c|
   c.desc delete_desc
   c.action do |global_options, options, args|
-    puts "delete bag is not supported at this time"
-    # TODO: prompt for verification
+    # TODO: add * for all bags
+    puts "This will delete all the bags matching \"#{args[0]}\"."
+    print "Are you sure? (yes to confirm. Anything else to cancel) "
+    value = STDIN.gets.chomp
+
+    puts "your input: #{value}" if $debug
+    if value.upcase == 'YES'
+      pattern = args[0]
+      # TODO: put this code into a helper (or Keyp) method
+      # get files matching pattern
+      # http://stackoverflow.com/questions/6605344/list-files-based-on-a-pattern-in-a-specific-directory-one-command-only
+
+      # use this code if we want to report on all the files we delete
+      delete_type = 1
+
+      case delete_type
+        when 1
+          files = Dir["#{File.join(Keyp.home,pattern+Keyp.ext)}"]
+          puts "going to delete files #{files}" if $debug
+          files.each do |f|
+            puts "deleted #{f}" if $debug
+            File.delete(f)
+          end
+        when 2
+          result = File.delete(args[0])
+          puts "delete results: #{result}"
+          #TODO: provide feedback
+      end
+
+    else
+      puts "delete bags canceled."
+    end
   end
 end
 
@@ -239,12 +268,13 @@ command :show do |c|
 end
 
 post do |global_options, command, options, args|
-  # if bag.data is dirty, then save
-  if $debug
-    puts "post-hook, state of bag.dirty = #{$bag.dirty}"
-  end
 
-  unless command.name == :setup
+  unless [:setup, :show, :delete].include? command.name
+    if $debug
+      puts "post-hook, state of bag.dirty = #{$bag.dirty}"
+    end
+    # if bag.data is dirty, then save
+    # TODO: check bag.save. if it checks dirty, then we don't need to check here
     $bag.save
   else
     true

@@ -2,25 +2,26 @@ require 'spec_helper'
 
 describe Keyp::Bag do
 
+  def bag_name_for_testing
+    # TODO: pseudo random bag name generation to a helper
+    "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
+  end
+
   context "is empty" do
     before (:each) do
-      puts "before : is empty"
-      @bag = Keyp::Bag.new 'testing123'
+      @bag_name = bag_name_for_testing
+      @bag = Keyp::Bag.new @bag_name
     end
 
     it "should return an empty hash" do
-
       @bag.data.size.should == 0
     end
-    #it "should have metadata" do
-    #  @bag.meta['created_on'].should_not == nil
-    #end
   end
 
   context "is not empty" do
     before (:each) do
-      puts "before : is not empty"
-      @bag = Keyp::Bag.new 'grue_eats_you'
+      @bag_name = bag_name_for_testing
+      @bag = Keyp::Bag.new @bag_name
       @bag['LIGHTS'] = 'out'
     end
 
@@ -31,9 +32,8 @@ describe Keyp::Bag do
 
   context "environment variables" do
     before (:each) do
-      # TODO: pseudo random bag name generation to a helper
-      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
-      @bag = Keyp::Bag.new bag_name
+      @bag_name = bag_name_for_testing
+      @bag = Keyp::Bag.new @bag_name
     end
     it "should copy all vars"  do
       testvars = {
@@ -81,9 +81,8 @@ describe Keyp::Bag do
   context "bag state" do
 
     before (:each) do
-      # TODO: pseudo random bag name generation to a helper
-      bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
-      @bag = Keyp::Bag.new bag_name
+      @bag_name = bag_name_for_testing
+      @bag = Keyp::Bag.new @bag_name
     end
 
     it 'should not set the dirty flag when no items are in the bag' do
@@ -118,10 +117,32 @@ describe Keyp::Bag do
       @bag['KEY1'] = 'value1'
       @bag.dirty.should == false
     end
+
+    it 'should allow assigning a key if not read only'
+    it 'should not allow assigning a key if read only'
+  end
+
+  context "metadata" do
+
+    before (:each) do
+      @bag_name = bag_name_for_testing
+      @bag = Keyp::Bag.new @bag_name
+    end
+
+    it "should have metadata" do
+    #  @bag.meta['created_on'].should_not == nil
+    end
+
+    it 'Should not update created_at after bag is initially created'
+    it 'should update updated_at when bag is saved' do
+
+    end
+
+    it 'Should not update updated_at if bag has not been saved'
+
   end
 
   it 'should return a key with data member'
   it 'should return a key acting as a hash'
-  it 'should allow assigning a key if not read only'
-  it 'should not allow assigning a key if read only'
+
 end
