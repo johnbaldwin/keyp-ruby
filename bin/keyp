@@ -213,42 +213,48 @@ command :create do |c|
   end
 end
 
-delete_desc = 'Deletes an existing bag'
+delete_desc = 'Deletes an existing bag or set of bags matching the delete parameter'
 desc delete_desc
 command :delete do |c|
+  c.desc 'forces delete (no prompting)'
+  c.switch [:f, :force]
+  c.desc "outputs the name of each file as it's deleted"
+  c.switch [:v, :verbose]
+  c.desc "Confirm deletion of each file. Currently not enabled"
+  c.switch [:c, :confirm]
   c.desc delete_desc
   c.action do |global_options, options, args|
     # TODO: add * for all bags
-    puts "This will delete all the bags matching \"#{args[0]}\"."
-    print "Are you sure? (yes to confirm. Anything else to cancel) "
-    value = STDIN.gets.chomp
+    # TODO: enable prompting per file. Confirm skips the global confirm
 
-    puts "your input: #{value}" if $debug
-    if value.upcase == 'YES'
-      pattern = args[0]
-      # TODO: put this code into a helper (or Keyp) method
-      # get files matching pattern
-      # http://stackoverflow.com/questions/6605344/list-files-based-on-a-pattern-in-a-specific-directory-one-command-only
+    help_now!('filename pattern is required') if args.empty?
 
-      # use this code if we want to report on all the files we delete
+    if options[:force]
+      do_delete = true
+    else
+      puts "This will delete all the bags matching \"#{args[0]}\"."
+      print "Are you sure? (yes to confirm. Anything else to cancel) "
+      do_delete = STDIN.gets.chomp.upcase == 'YES'
+    end
+
+    if do_delete
+      # experimenting with different techniques
       delete_type = 1
-
       case delete_type
         when 1
-          files = Dir["#{File.join(Keyp.home,pattern+Keyp.ext)}"]
+          files = Dir["#{File.join(Keyp.home,args[0]+Keyp.ext)}"]
           puts "going to delete files #{files}" if $debug
           files.each do |f|
-            puts "deleted #{f}" if $debug
             File.delete(f)
+            puts "deleted #{File.basename(f, Keyp.ext)}" if options[:verbose]
           end
         when 2
           result = File.delete(args[0])
           puts "delete results: #{result}"
           #TODO: provide feedback
       end
-
     else
-      puts "delete bags canceled."
+      puts "delete bag(s) canceled."
     end
   end
 end
