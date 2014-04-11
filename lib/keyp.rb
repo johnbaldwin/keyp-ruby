@@ -43,6 +43,8 @@ module Keyp
   # Default home directory that keyp uses to store bags
   DEFAULT_KEYP_DIR = '.keyp'
 
+  # number of digits for the fractional seconds in decimal
+  TIMESTAMP_FS_DIGITS = 6
   #TODO: set this
   #ENV_VAR_NAME_REGEX =
 
@@ -160,7 +162,7 @@ module Keyp
   # Creates a new bag if one does not already exist with the given name
   #
   def self.create_bag(name, options = {} )
-    time_now = Time.now.utc.iso8601
+    time_now = Time.now.utc.iso8601(TIMESTAMP_FS_DIGITS)
     file_data = {}
     file_data['meta'] = {
       'name' => name,

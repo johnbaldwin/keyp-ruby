@@ -14,7 +14,7 @@ module Keyp
   class Bag
 
     attr_reader :keypdir, :dirty
-    attr_accessor :name, :data, :file_hash
+    attr_accessor :name, :data, :meta, :file_hash
 
     ##
     # Returns the full path of this Bag's file
@@ -243,8 +243,6 @@ module Keyp
         # otherwise, raise
         # TODO: implement merge from updated file and raise only if conflict
         begin
-          file_data = { 'meta' => @meta, 'data' => @data }
-
           if File.exist? keypfile
             read_file_data = load(keypfile)
             unless @file_hash == read_file_data[:file_hash]
@@ -252,6 +250,8 @@ module Keyp
                         "found hash #{read_file_data[:file_hash]}"
             end
           end
+          @meta['updated_at'] = Time.now.utc.iso8601(Keyp::TIMESTAMP_FS_DIGITS)
+          file_data = { 'meta' => @meta, 'data' => @data }
           File.open(keypfile, 'w') do |f|
             f.write file_data.to_yaml
           end

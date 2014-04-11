@@ -133,9 +133,18 @@ describe Keyp::Bag do
     #  @bag.meta['created_on'].should_not == nil
     end
 
-    it 'Should not update created_at after bag is initially created'
-    it 'should update updated_at when bag is saved' do
+    it 'Should not update created_at after bag is initially created' do
+      created_at = @bag.meta['created_at']
+      @bag['foo'] = 'bar'
+      @bag.save
+      @bag.meta['created_at'].should == created_at
+    end
 
+    it 'should update updated_at when bag is saved' do
+      updated_at = @bag.meta['updated_at']
+      @bag['foo'] = 'bar'
+      @bag.save
+      @bag.meta['updated_at'].should > updated_at
     end
 
     it 'Should not update updated_at if bag has not been saved'
