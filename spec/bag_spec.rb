@@ -147,7 +147,11 @@ describe Keyp::Bag do
       @bag.meta['updated_at'].should > updated_at
     end
 
-    it 'Should not update updated_at if bag has not been saved'
+    it 'Should not update updated_at if bag has not been saved' do
+      updated_at = @bag.meta['updated_at']
+      @bag['foo'] = 'bar'
+      @bag.meta['updated_at'].should == updated_at
+    end
 
   end
 

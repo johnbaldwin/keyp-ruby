@@ -48,6 +48,9 @@ describe Keyp do
       Keyp.exist?(bag_name).should_not == true
     end
 
+    it "Should rename a bag if new name does not exist (and names are different)"
+    it "Should not rename a bag if new name exists"
+
   end
 
 

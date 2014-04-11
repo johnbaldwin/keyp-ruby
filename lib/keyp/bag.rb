@@ -4,17 +4,15 @@ module Keyp
   # Some inspiration:
   # http://stackoverflow.com/questions/2680523/dry-ruby-initialization-with-hash-argument
   #
-  # TODO: add handling so that keys (hierarchical keys too) are accessed as members instead of
-  # hash access
+  # TODO: add handling so that keys (hierarchical keys too) are accessed as members instead of hash access
   #
-  # TODO: move to own file, rename to "Bag"
   # TODO: i18n error messages
   # TODO: handle symbol to string and back for keys. Need instance setting to handle validating keys as symbols
   #
   class Bag
 
-    attr_reader :keypdir, :dirty
-    attr_accessor :name, :data, :meta, :file_hash
+    attr_reader :keypdir, :dirty, :meta
+    attr_accessor :name, :data, :file_hash
 
     ##
     # Returns the full path of this Bag's file
@@ -106,6 +104,11 @@ module Keyp
     # Returns true if there are no key:value pairs, false if there are any
     def empty?
       @data.empty?
+    end
+
+
+    def read_only?
+      @read_only
     end
 
     def key?(key)

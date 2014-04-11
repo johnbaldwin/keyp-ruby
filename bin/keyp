@@ -6,16 +6,18 @@
 # implementations. A good number and a few well known use Thor, so seems like a good idea to
 # figure out how to use Thor as well.
 #
-# I'm trying out some of the different impementations for Keyp, learning how they work, pros and cons
-# Then I'll pick a single approach after exploring them
+
 
 # TO run in the project dir:
 # ruby -Ilib ./bin/keyp
+# or
+# bundle exec bin/keyp
 
 # resolve bin path, ignoring symlinks
 require 'pathname'
 bin_file = Pathname.new(__FILE__).realpath
 
+# The Keyp CLI uses GLI
 # http://davetron5000.github.io/gli/
 require 'gli'
 
@@ -23,13 +25,6 @@ require 'pp'
 
 require 'keyp'
 include GLI::App
-
-# keyp set key=value
-# keyp get key
-# keyp
-
-
-# keyp create bag
 
 program_desc 'A command line interface for the Keyp key:value manager'
 
