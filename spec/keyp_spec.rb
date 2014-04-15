@@ -2,6 +2,11 @@ require 'spec_helper'
 
 describe Keyp do
 
+  def bag_name_for_testing
+    # TODO: pseudo random bag name generation to a helper
+    "bring_a_towel_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
+  end
+
   context "CONSTANTS" do
     it 'should return correct version string' do
       #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
@@ -53,7 +58,12 @@ describe Keyp do
 
   end
 
+  context "Renaming bags" do
+    it "Should rename bag if it exists and new name does not"
 
+    it "Should not rename bag if current name does not exist"
+    it "Should not rename bag if new name exists"
+  end
 
 
   # Braindump of tests

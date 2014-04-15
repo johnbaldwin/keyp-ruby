@@ -11,6 +11,9 @@ module Keyp
   #
   class Bag
 
+    # TODO: Make name attr_reader
+    # TODO: See if we need data as an attr_accessor If not then it makes
+    # it easier to encapsulate handling of string/symbol keys
     attr_reader :keypdir, :dirty, :meta
     attr_accessor :name, :data, :file_hash
 
@@ -60,6 +63,7 @@ module Keyp
     ##
     #
     def [](key)
+      # TODO: convert from any symbols to string
       @data[key]
     end
 
@@ -73,6 +77,7 @@ module Keyp
     # Sets a key:value pair
     # NOTE: This may be made protected
     def set_prop(key, value)
+      # TODO
       unless @read_only
         # TODO: check if data has been modified
         # maybe there is a way hash tells us its been modified. If not then
@@ -89,15 +94,12 @@ module Keyp
     ##
     # Deletes the key:value pair from this bag for the given key
     def delete(key)
-      unless @read_only
-        if @data.key? key
-          @dirty = true
-        end
-        val = @data.delete(key)
-      else
-        raise "Bag #{@name} is read only"
+      if @read_only
+        raise "Cannot delete key \"#{key}\". Bag \"#{@name}\" is read only."
       end
-      val
+
+      @dirty = true if @data.key? key
+      @data.delete(key)
     end
 
     ##
@@ -180,6 +182,31 @@ module Keyp
 
     # TODO add from hash
 
+    def rename(new_name, options = {})
+
+      # TODO: Check for valid key name
+      #TODO: change to try to create a new file and lock it. If we can, then we fill it
+      if Keyp::exist?(new_name)
+        raise "Bag rename error. Target \"#{new_name}\" already exists."
+      end
+
+      if @dirty
+        # We don't want to allow renaming a bag with modified values because it will complicate rollback
+        #TODO: improve error message
+        raise "Can't rename a modified bag. Save first"
+      end
+
+      # TODO: treat the following as a transaction so if the bag file can't be renamed then
+      # the old file is restored unmodified
+      curr_name = @meta['name']
+      from_file = Keyp::bag_path(curr_name)
+      to_file = Keyp::bag_path(new_name)
+      #TODO: Add file locking for concurrency protection
+      @meta['name'] = new_name
+      save
+
+      result = File.rename(from_file, to_file)
+    end
 
     def import(filename)
       raise "import not yet supported"

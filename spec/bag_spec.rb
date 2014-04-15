@@ -155,6 +155,37 @@ describe Keyp::Bag do
 
   end
 
+  context 'bag management' do
+    it 'Should rename if new name does not exist' do
+      from_name = bag_name_for_testing
+      kp = {
+          'key1' => 'value1',
+          'key2' => 'value2'
+      }
+      bag = Keyp::Bag.new from_name
+      # seed a couple of kv pairs just to keep it a bit real
+      # but we should also test with an empty bag
+      kp.each {|k,v| bag[k] = v }
+      bag.save
+      before_meta = {}
+      bag.meta.each { |k,v| before_meta[k] = v }
+      sleep(1)
+      to_name = bag_name_for_testing
+      to_name.should_not == from_name
+      # we know the to_name does not exist
+
+      result = bag.rename(to_name)
+
+      bag.meta['name'].should == to_name
+      bag.meta['created_at'].should == before_meta['created_at']
+      bag.meta['updated_at'].should_not == before_meta['updated_at']
+      bag.meta['name'].should_not == before_meta['name']
+
+
+    end
+  end
+
+
   it 'should return a key with data member'
   it 'should return a key acting as a hash'
 
