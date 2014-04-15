@@ -54,7 +54,7 @@ describe Keyp::Bag do
       end
     end
 
-    it "should receive all vars" do
+    it 'Should receive all vars' do
       test_keyvals = {
         'foo' => 'bar',
         'biz' => 'baz',
@@ -68,48 +68,48 @@ describe Keyp::Bag do
       end
       @bag.load_from_env
       ENV.each do |key,value|
-        puts "testing key=#{key}"
+        #puts "testing key=#{key}"
         @bag.key?(key).should == true
         @bag[key].should == value
       end
     end
 
-    it "should not overwrite existing keys"
-    it "should match filtering pattern"
+    it 'Should not overwrite existing keys'
+    it 'Should match filtering pattern'
   end
 
-  context "bag state" do
+  context 'Bag state' do
 
     before (:each) do
       @bag_name = bag_name_for_testing
       @bag = Keyp::Bag.new @bag_name
     end
 
-    it 'should not set the dirty flag when no items are in the bag' do
+    it 'Should not set the dirty flag when no items are in the bag' do
       @bag.empty?.should == true
       @bag.dirty.should == false
     end
 
-    it 'should set the dirty flag if a new key is created' do
+    it 'Should set the dirty flag if a new key is created' do
       @bag['KEY1'] = 'value1'
       @bag.empty?.should == false
       @bag.dirty.should == true
 
     end
 
-    it 'should not set the dirty flag after save' do
+    it 'Should not set the dirty flag after save' do
       @bag.empty?.should == true
       @bag['KEY1'] = 'value1'
       @bag.save
       @bag.dirty.should == false
     end
-    it 'should set the dirty flag if a key is given a new value' do
+    it 'Should set the dirty flag if a key is given a new value' do
       @bag.empty?.should == true
       @bag['KEY1'] = 'value1'
       @bag.dirty.should == true
     end
 
-    it 'should not set the dirty flag if a key is assigned a value equal to its existing value' do
+    it 'Should not set the dirty flag if a key is assigned a value equal to its existing value' do
       @bag.empty?.should == true
       @bag['KEY1'] = 'value1'
       @bag.save
@@ -118,11 +118,11 @@ describe Keyp::Bag do
       @bag.dirty.should == false
     end
 
-    it 'should allow assigning a key if not read only'
-    it 'should not allow assigning a key if read only'
+    it 'Should allow assigning a key if not read only'
+    it 'Should not allow assigning a key if read only'
   end
 
-  context "metadata" do
+  context 'Metadata' do
 
     before (:each) do
       @bag_name = bag_name_for_testing
@@ -155,7 +155,7 @@ describe Keyp::Bag do
 
   end
 
-  context 'bag management' do
+  context 'Bag management' do
     it 'Should rename if new name does not exist' do
       from_name = bag_name_for_testing
       kp = {
@@ -178,7 +178,8 @@ describe Keyp::Bag do
 
       bag.meta['name'].should == to_name
       bag.meta['created_at'].should == before_meta['created_at']
-      bag.meta['updated_at'].should_not == before_meta['updated_at']
+      # Since we are not changing any key pairs, updated_at doesn't change
+      bag.meta['updated_at'].should == before_meta['updated_at']
       bag.meta['name'].should_not == before_meta['name']
 
 

@@ -34,7 +34,7 @@ module Keyp
       # I'm not happy with how creating instance variables works. There must be a cleaner way
       @name = name
       options.each do |k,v|
-        puts "processing options #{k} = #{v}"
+        #JB set debug log: puts "processing options #{k} = #{v}"
         instance_variable_set("@#{k}", v) unless v.nil?
       end
       # set attributes not set by params
@@ -49,7 +49,7 @@ module Keyp
       # not the most efficient thing, but simpler and safe enough for now
 
       unless File.exist? keypfile
-        puts "Bag.initialize, create_bag #{keypfile}"
+        #JB set debug log: puts "Bag.initialize, create_bag #{keypfile}"
         Keyp::create_bag(name)
       end
       file_data = load(keypfile)
@@ -182,8 +182,12 @@ module Keyp
 
     # TODO add from hash
 
+    ##
+    # renames the bag to +new_name+
+    #
     def rename(new_name, options = {})
-
+      # Since we are not changing any key pairs, the only meta to be changed is +name+
+      #
       # TODO: Check for valid key name
       #TODO: change to try to create a new file and lock it. If we can, then we fill it
       if Keyp::exist?(new_name)
