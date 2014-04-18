@@ -15,7 +15,7 @@ module Keyp
     # TODO: See if we need data as an attr_accessor If not then it makes
     # it easier to encapsulate handling of string/symbol keys
     attr_reader :keypdir, :dirty, :meta
-    attr_accessor :name, :data, :file_hash
+    attr_accessor :data, :file_hash
 
     ##
     # Returns the full path of this Bag's file
@@ -89,6 +89,10 @@ module Keyp
       else
         raise "Bag #{@name} is read only"
       end
+    end
+
+    def name
+      @meta['name']
     end
 
     ##

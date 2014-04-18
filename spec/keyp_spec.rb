@@ -8,7 +8,7 @@ describe Keyp do
   end
 
   context 'CONSTANTS' do
-    it 'Should return correct version string' do
+    it 'should return correct version string' do
       #Keyp.version_string.should == "Keyp version #{Keyp::VERSION}"
       Keyp::VERSION.should == '0.0.7'
     end
@@ -17,11 +17,11 @@ describe Keyp do
       Keyp::DEFAULT_BAG.should == 'default'
     end
 
-    it 'Should specifify default store extension' do
+    it 'should specifify default store extension' do
       Keyp::DEFAULT_EXT.should == '.yml'
     end
 
-    it 'Should specify default keyp dir' do
+    it 'should specify default keyp dir' do
       Keyp::DEFAULT_KEYP_DIR.should == '.keyp'
     end
   end
@@ -32,7 +32,7 @@ describe Keyp do
       Keyp::home.should == File.join(ENV['HOME'], '.keyp')
     end
 
-    it 'Should be able to override default keyp dir'
+    it 'should be able to override default keyp dir'
   end
 
   context 'Bag management' do
@@ -47,22 +47,22 @@ describe Keyp do
       Keyp.exist?(keyper.name).should == true
     end
 
-    it 'Should say a bag does not exist' do
+    it 'should say a bag does not exist' do
       # TODO: add bag name generation to a helper
       bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
       Keyp.exist?(bag_name).should_not == true
     end
 
-    it 'Should rename a bag if new name does not exist (and names are different)'
-    it 'Should not rename a bag if new name exists'
+    it 'should rename a bag if new name does not exist (and names are different)'
+    it 'should not rename a bag if new name exists'
 
   end
 
   context 'Renaming bags' do
-    it 'Should rename bag if it exists and new name does not'
+    it 'should rename bag if it exists and new name does not'
 
-    it 'Should not rename bag if current name does not exist'
-    it 'Should not rename bag if new name exists'
+    it 'should not rename bag if current name does not exist'
+    it 'should not rename bag if new name exists'
   end
 
 
