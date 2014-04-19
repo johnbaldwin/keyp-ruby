@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'tmpdir'
+require 'fileutils'
 
 describe Keyp do
 
@@ -26,13 +28,38 @@ describe Keyp do
     end
   end
 
-  context 'Keyp directory' do
+  context 'Default Keyp directory' do
     it 'should return correct default keyp dir' do
       # DEFAULT_KEYP_DIRNAME = ENV['KEYP_DIRNAME'] || '.keyp'
       Keyp::home.should == File.join(ENV['HOME'], '.keyp')
     end
+  end
 
-    it 'should be able to override default keyp dir'
+  context 'Alternate Keyp directory' do
+
+
+    before (:each) do
+      @root_tempdir = Dir.mktmpdir
+      @temp_keyp_dir = File.join(@root_tempdir,Keyp::DEFAULT_KEYP_DIR)
+      ENV['KEYP_HOME'] = @temp_keyp_dir
+    end
+
+    it 'should be able to override default keyp dir' do
+      puts "ENV['KEYP_HOME']=#{ENV['KEYP_HOME']}"
+      keyp_dir = Keyp::setup
+      keyp_dir.should == Keyp::home
+      keyp_dir.should == @temp_keyp_dir
+      Keyp::home.should == ENV['KEYP_HOME']
+
+    end
+
+    #TODO: Keyp::setup should return nil when trying to setup to an existing dir
+    # Check if we can describe a method
+    after (:each) do
+      puts "AFTER called, going to try to delete #{@tempdir}"
+      FileUtils.rm_rf @root_tempdir
+      ENV['KEYP_HOME'] = nil
+    end
   end
 
   context 'Bag management' do

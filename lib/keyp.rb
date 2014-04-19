@@ -66,7 +66,16 @@ module Keyp
   # it is recommended you restrict permissions
   #
   def self.home
-    ENV['KEPY_HOME'] || File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
+    #puts "Keyp::home, KEYP_HOME=#{ENV['KEYP_HOME']}"
+    ENV['KEYP_HOME'] || File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
+=begin
+    puts "home_dir=#{home_dir}"
+    if ENV['KEYP_HOME']
+      ENV['KEYP_HOME']
+    else
+      File.join(ENV['HOME'], DEFAULT_KEYP_DIR)
+    end
+=end
   end
 
   ##
@@ -101,10 +110,10 @@ module Keyp
       if Dir.exist?(home)
         home
       else
-        nil
+        raise "unable to create Keyp directory #{home}"
       end
     else
-      Puts "#{home} already exists"
+      puts "#{home} already exists"
       nil
     end
   end
