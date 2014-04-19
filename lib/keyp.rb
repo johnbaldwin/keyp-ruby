@@ -105,7 +105,6 @@ module Keyp
     # check if keyp directory exists
 
     unless Dir.exist?(home)
-      puts "making directory #{home}"
       Dir.mkdir(home, 0700)
       if Dir.exist?(home)
         home
@@ -113,7 +112,6 @@ module Keyp
         raise "unable to create Keyp directory #{home}"
       end
     else
-      puts "#{home} already exists"
       nil
     end
   end
