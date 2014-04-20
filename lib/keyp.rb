@@ -207,17 +207,26 @@ module Keyp
   # == options
   # +:from+ current name of the bag (rename from)
   # +:to+ new name of the bag (rename to)
+  #
   def self.rename_bag(options = {})
+
+    #TODO: Implement this
+    # validate_options(:from,:to)
 
     from_name = options[:from]
     to_name = options[:to]
+
+    unless from_name || to_name
+      raise "required parameters are missing. Requires both :from and :to"
+    end
 
     # if current bag does not exist, we raise and exception
     unless exist?(from_name)
       raise ("cannot rename #{from_name} because it does not exist")
     end
-    bag = bag(from_name)
-    bag.rename(to_name)
+    #bag = bag(from_name)
+    #bag.rename(to_name)
+    bag(from_name).rename(to_name)
   end
 
   def self.parse_arg_string(arg_string, options={})

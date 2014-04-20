@@ -188,6 +188,7 @@ module Keyp
 
     ##
     # renames the bag to +new_name+
+    # returns new bag name if succesful, raises exception if not
     #
     def rename(new_name, options = {})
       # Since we are not changing any key pairs, the only meta to be changed is +name+
@@ -212,8 +213,9 @@ module Keyp
       #TODO: Add file locking for concurrency protection
       @meta['name'] = new_name
       save
-
-      result = File.rename(from_file, to_file)
+      # Raises a SystemCallError if the file cannot be renamed.
+      File.rename(from_file, to_file)
+      @meta['name']
     end
 
     def import(filename)
