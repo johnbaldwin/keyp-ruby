@@ -204,9 +204,6 @@ module Keyp
     # returns new bag name if succesful, raises exception if not
     #
     def rename(new_name, options = {})
-      puts "--- rename ----"
-      puts "--- old name: #{@meta['name']}"
-      puts "--- new name: #{new_name}"
 
       # Since we are not changing any key pairs, the only meta to be changed is +name+
       #
@@ -226,31 +223,20 @@ module Keyp
       # the old file is restored unmodified
       #curr_name = @meta['name']
       curr_name = name
-      from_file = Keyp::bag_path(curr_name)
+      old_file = Keyp::bag_path(curr_name)
       to_file = Keyp::bag_path(new_name)
       #TODO: Add file locking for concurrency protection
       @meta['name'] = new_name
       @meta['last_name'] =curr_name
-          puts "rename, new_name = #{new_name}"
-      puts "rename, assigning @meta to new name = #{@meta['name']}"
       @renaming = true
       # saves with the new name
       save
-
-      # now remove the old file
-
       @renaming = nil
-      puts "rename, after save, before mv file, @meta['name']=#{@meta['name']}"
+      # now remove the old file
+      File.delete(old_file)
 
-      test_load = load from_file
-      puts "*** test_load:"
-      puts test_load
-      # Raises a SystemCallError if the file cannot be renamed.
-      File.rename(from_file, to_file)
-      puts "done with rename, loading file #{to_file}"
       file_data = load to_file
       @meta = file_data[:meta]
-      puts "rename loading. new name = #{@meta['name']}"
       @data = file_data[:data]|| {}
       @file_hash = file_data[:file_hash]
       @meta['name']
@@ -276,7 +262,6 @@ module Keyp
     # TODO: Make this a class method and an instance method
     # that calls the class method and does the instance assignment
     def load (config_path)
-      #config_data = {}
       # Get extension
       file_ext = File.extname(config_path)
 
@@ -312,14 +297,10 @@ module Keyp
     # NOT thread safe
     # TODO: make thread safe
     def save
-      puts "*** save called"
       if @read_only
         raise "This bag instance is read only"
       end
       if @dirty || @renaming
-        if @renaming
-          puts "# save, renaming: name = #{meta['name']}"
-        end
         # lock file
         # read checksum
         # if checksum matches our saved checksum then update file and release lock
@@ -338,10 +319,8 @@ module Keyp
           end
 
           file_data = { 'meta' => @meta, 'data' => @data }
-          puts "saving meta. file_data[meta][name]=#{file_data['meta']['name']}"
           File.open(keypfile, 'w') do |f|
-            r = f.write file_data.to_yaml
-            puts "results of write: #{r}"
+            f.write file_data.to_yaml
           end
           @dirty = false
         rescue
@@ -353,8 +332,5 @@ module Keyp
       end
     end
 
-    def test_set_meta(key,value)
-      @meta[key]=value
-    end
-  end
-end
+  end # class Bag
+end # module Keyp
