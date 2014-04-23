@@ -17,10 +17,14 @@ module Keyp
     attr_reader :keypdir, :dirty, :meta
     attr_accessor :data, :file_hash
 
+    def name
+      @meta['name']
+    end
+
     ##
     # Returns the full path of this Bag's file
     def keypfile
-      File.join(@keypdir, @name+@ext)
+      File.join(@keypdir, name+@ext)
     end
 
     ##
@@ -30,9 +34,9 @@ module Keyp
     # +keypdir+
     # +read_only+
     # +ext+
-    def initialize(name, options = {})
+    def initialize(bag_name, options = {})
       # I'm not happy with how creating instance variables works. There must be a cleaner way
-      @name = name
+      @meta = { 'name' => bag_name}
       options.each do |k,v|
         #JB set debug log: puts "processing options #{k} = #{v}"
         instance_variable_set("@#{k}", v) unless v.nil?
@@ -50,10 +54,23 @@ module Keyp
 
       unless File.exist? keypfile
         #JB set debug log: puts "Bag.initialize, create_bag #{keypfile}"
-        Keyp::create_bag(name)
+        #TODO: move this to its own method
+        time_now = Time.now.utc.iso8601(TIMESTAMP_FS_DIGITS)
+        file_data = {}
+        file_data['meta'] = {
+            'name' => bag_name,
+            'description' => '',
+            'created_at' => time_now,
+            'updated_at' => time_now
+        }
+        file_data['data'] = nil
+        File.open(Keyp::bag_path(bag_name), 'w') do |f|
+          f.write file_data.to_yaml
+          f.chmod(0600)
+        end
       end
       file_data = load(keypfile)
-
+      # replace meta
       @meta = file_data[:meta]
       @data = file_data[:data]|| {}
       @file_hash = file_data[:file_hash]
@@ -87,19 +104,15 @@ module Keyp
           @dirty = true
         end
       else
-        raise "Bag #{@name} is read only"
+        raise "Bag #{name} is read only"
       end
-    end
-
-    def name
-      @meta['name']
     end
 
     ##
     # Deletes the key:value pair from this bag for the given key
     def delete(key)
       if @read_only
-        raise "Cannot delete key \"#{key}\". Bag \"#{@name}\" is read only."
+        raise "Cannot delete key \"#{key}\". Bag \"#{name}\" is read only."
       end
 
       @dirty = true if @data.key? key
@@ -191,6 +204,10 @@ module Keyp
     # returns new bag name if succesful, raises exception if not
     #
     def rename(new_name, options = {})
+      puts "--- rename ----"
+      puts "--- old name: #{@meta['name']}"
+      puts "--- new name: #{new_name}"
+
       # Since we are not changing any key pairs, the only meta to be changed is +name+
       #
       # TODO: Check for valid key name
@@ -207,14 +224,35 @@ module Keyp
 
       # TODO: treat the following as a transaction so if the bag file can't be renamed then
       # the old file is restored unmodified
-      curr_name = @meta['name']
+      #curr_name = @meta['name']
+      curr_name = name
       from_file = Keyp::bag_path(curr_name)
       to_file = Keyp::bag_path(new_name)
       #TODO: Add file locking for concurrency protection
       @meta['name'] = new_name
+      @meta['last_name'] =curr_name
+          puts "rename, new_name = #{new_name}"
+      puts "rename, assigning @meta to new name = #{@meta['name']}"
+      @renaming = true
+      # saves with the new name
       save
+
+      # now remove the old file
+
+      @renaming = nil
+      puts "rename, after save, before mv file, @meta['name']=#{@meta['name']}"
+
+      test_load = load from_file
+      puts "*** test_load:"
+      puts test_load
       # Raises a SystemCallError if the file cannot be renamed.
       File.rename(from_file, to_file)
+      puts "done with rename, loading file #{to_file}"
+      file_data = load to_file
+      @meta = file_data[:meta]
+      puts "rename loading. new name = #{@meta['name']}"
+      @data = file_data[:data]|| {}
+      @file_hash = file_data[:file_hash]
       @meta['name']
     end
 
@@ -235,7 +273,8 @@ module Keyp
     # Give full path, attempt to load
     # sticking with YAML format for now
     # May add new file format later in which case we'll
-    # TODO: consider changing to class method
+    # TODO: Make this a class method and an instance method
+    # that calls the class method and does the instance assignment
     def load (config_path)
       #config_data = {}
       # Get extension
@@ -273,10 +312,14 @@ module Keyp
     # NOT thread safe
     # TODO: make thread safe
     def save
+      puts "*** save called"
       if @read_only
         raise "This bag instance is read only"
       end
-      if @dirty
+      if @dirty || @renaming
+        if @renaming
+          puts "# save, renaming: name = #{meta['name']}"
+        end
         # lock file
         # read checksum
         # if checksum matches our saved checksum then update file and release lock
@@ -290,17 +333,28 @@ module Keyp
                         "found hash #{read_file_data[:file_hash]}"
             end
           end
-          @meta['updated_at'] = Time.now.utc.iso8601(Keyp::TIMESTAMP_FS_DIGITS)
+          if @dirty && !@renaming
+            @meta['updated_at'] = Time.now.utc.iso8601(Keyp::TIMESTAMP_FS_DIGITS)
+          end
+
           file_data = { 'meta' => @meta, 'data' => @data }
+          puts "saving meta. file_data[meta][name]=#{file_data['meta']['name']}"
           File.open(keypfile, 'w') do |f|
-            f.write file_data.to_yaml
+            r = f.write file_data.to_yaml
+            puts "results of write: #{r}"
           end
           @dirty = false
         rescue
           # TODO: log error
 
         end
+      else
+        puts "save called but not saving (not dirty or renaming flag set"
       end
+    end
+
+    def test_set_meta(key,value)
+      @meta[key]=value
     end
   end
 end

@@ -168,26 +168,14 @@ module Keyp
   ##
   # Creates a new bag if one does not already exist with the given name
   #
+
   def self.create_bag(name, options = {} )
-    time_now = Time.now.utc.iso8601(TIMESTAMP_FS_DIGITS)
-    file_data = {}
-    file_data['meta'] = {
-      'name' => name,
-      'description' => '',
-      'created_at' => time_now,
-      'updated_at' => time_now
-    }
-    file_data['data'] = nil
     unless exist? name
-      File.open(bag_path(name), 'w') do |f|
-        f.write file_data.to_yaml
-        f.chmod(0600)
-      end
-    else
-      raise "Unable to create a new store at #{filepath}. One already exists."
+      Bag.new(name)
     end
-    bag name
+      raise "Unable to create a new store at #{filepath}. One already exists."
   end
+
 
   ##
   # Deletes the bag matching the name
@@ -224,9 +212,9 @@ module Keyp
     unless exist?(from_name)
       raise ("cannot rename #{from_name} because it does not exist")
     end
-    #bag = bag(from_name)
-    #bag.rename(to_name)
-    bag(from_name).rename(to_name)
+    bag = bag(from_name)
+    bag.rename(to_name)
+    #bag(from_name).rename(to_name)
   end
 
   def self.parse_arg_string(arg_string, options={})
