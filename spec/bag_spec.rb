@@ -173,6 +173,7 @@ describe Keyp::Bag do
 
     it 'should rename if new name does not exist' do
       bag = @from_bag
+      puts "Testing bag rename with from_name #{@from_name}"
       kp = {
           'key1' => 'value1',
           'key2' => 'value2'
@@ -187,8 +188,9 @@ describe Keyp::Bag do
       bag.name.should == @from_name
       @to_name.should_not == @from_name
       # we know the to_name does not exist
-
+      puts "### SPEC before bag.rename"
       result = bag.rename(@to_name)
+      puts "### SPEC after bag.rename"
       bag.name.should == @to_name
       bag.meta['name'].should == @to_name
       bag.meta['created_at'].should == before_meta['created_at']

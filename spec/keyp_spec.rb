@@ -79,15 +79,46 @@ describe Keyp do
       bag_name = "grue_eats_you_when_it_is_dark_#{Time.now.strftime("%Y%m%d%H%M%S%L")}"
       Keyp.exist?(bag_name).should_not == true
     end
-
-    it 'should rename a bag if new name does not exist (and names are different)'
-    it 'should not rename a bag if new name exists'
-
   end
 
   context 'Renaming bags' do
-    it 'should rename bag if it exists and new name does not'
+    # NOTE: Yeah, this code and the bag_spec code are redundant
+    before (:each) do
+      @from_name = bag_name_for_testing
+      @from_bag = Keyp.create_bag(@from_name)
+      sleep(1)
+      @to_name = bag_name_for_testing
+    end
+=begin
+    it 'should rename bag if it exists and new name does not' do
+      bag = @from_bag
+      kp = {
+          'key1' => 'value1',
+          'key2' => 'value2'
+      }
 
+      # seed a couple of kv pairs just to keep it a bit real
+      # but we should also test with an empty bag
+      kp.each {|k,v| bag[k] = v }
+      bag.save
+      before_meta = {}
+      bag.meta.each { |k,v| before_meta[k] = v }
+      bag.name.should == @from_name
+      @to_name.should_not == @from_name
+      # we know the to_name does not exist
+
+      #result = bag.rename(@to_name)
+      puts "From name=#{@from_name}"
+      puts "To name=#{@to_name}"
+      result = Keyp.rename_bag(from: @from_name, to: @to_name)
+      bag.name.should == @to_name
+      bag.meta['name'].should == @to_name
+      bag.meta['created_at'].should == before_meta['created_at']
+      # Since we are not changing any key pairs, updated_at doesn't change
+      bag.meta['updated_at'].should == before_meta['updated_at']
+      bag.meta['name'].should_not == before_meta['name']
+    end
+=end
     it 'should not rename bag if current name does not exist'
     it 'should not rename bag if new name exists'
   end
