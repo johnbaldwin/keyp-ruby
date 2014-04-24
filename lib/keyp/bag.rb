@@ -41,16 +41,11 @@ module Keyp
         #JB set debug log: puts "processing options #{k} = #{v}"
         instance_variable_set("@#{k}", v) unless v.nil?
       end
-      # set attributes not set by params
 
+      # set attributes not set by params
       @keypdir ||= Keyp::home
       @read_only ||= false
       @ext ||= Keyp::DEFAULT_EXT
-      #@keypfile = config_path
-      # load our resource
-
-      # load config file into hashes
-      # not the most efficient thing, but simpler and safe enough for now
 
       unless File.exist? keypfile
         #JB set debug log: puts "Bag.initialize, create_bag #{keypfile}"
@@ -69,11 +64,7 @@ module Keyp
           f.chmod(0600)
         end
       end
-      file_data = load(keypfile)
-      # replace meta
-      @meta = file_data[:meta]
-      @data = file_data[:data]|| {}
-      @file_hash = file_data[:file_hash]
+      load_file
       @dirty = false
     end
 
@@ -235,10 +226,7 @@ module Keyp
       # now remove the old file
       File.delete(old_file)
 
-      file_data = load to_file
-      @meta = file_data[:meta]
-      @data = file_data[:data]|| {}
-      @file_hash = file_data[:file_hash]
+      load_file
       @meta['name']
     end
 
@@ -256,12 +244,64 @@ module Keyp
     # TODO: def to_s
 
     ##
+    #
+    def load_file
+      file_data = Bag::load_file(keypfile)
+      @meta = file_data[:meta]
+      @data = file_data[:data]|| {}
+      @file_hash = file_data[:file_hash]
+    end
+
+    ##
+    # Saves the Bag to file
+    #
+    # NOT thread safe
+    # TODO: make thread safe
+    def save
+      if @read_only
+        raise "This bag instance is read only"
+      end
+      if @dirty || @renaming
+        # lock file
+        # read checksum
+        # if checksum matches our saved checksum then update file and release lock
+        # otherwise, raise
+        # TODO: implement merge from updated file and raise only if conflict
+        begin
+          if File.exist? keypfile
+            read_file_data = Bag::load_file(keypfile)
+            unless @file_hash == read_file_data[:file_hash]
+              raise "Will not write to #{keypfile}\nHashes differ. Expected hash =#{@file_hash}\n" +
+                        "found hash #{read_file_data[:file_hash]}"
+            end
+          end
+          if @dirty && !@renaming
+            @meta['updated_at'] = Time.now.utc.iso8601(Keyp::TIMESTAMP_FS_DIGITS)
+          end
+
+          file_data = { 'meta' => @meta, 'data' => @data }
+          File.open(keypfile, 'w') do |f|
+            f.write file_data.to_yaml
+          end
+          @dirty = false
+        rescue
+          # TODO: log error
+
+        end
+      else
+        puts "save called but not saving (not dirty or renaming flag set"
+      end
+    end
+
+
+    # Class methods
+    ##
     # Give full path, attempt to load
     # sticking with YAML format for now
     # May add new file format later in which case we'll
     # TODO: Make this a class method and an instance method
     # that calls the class method and does the instance assignment
-    def load (config_path)
+    def self.load_file (config_path)
       # Get extension
       file_ext = File.extname(config_path)
 
@@ -291,46 +331,6 @@ module Keyp
       { meta: file_data['meta'], data: file_data['data']||{}, file_hash: file_data.hash }
     end
 
-    ##
-    # Saves the Bag to file
-    #
-    # NOT thread safe
-    # TODO: make thread safe
-    def save
-      if @read_only
-        raise "This bag instance is read only"
-      end
-      if @dirty || @renaming
-        # lock file
-        # read checksum
-        # if checksum matches our saved checksum then update file and release lock
-        # otherwise, raise
-        # TODO: implement merge from updated file and raise only if conflict
-        begin
-          if File.exist? keypfile
-            read_file_data = load(keypfile)
-            unless @file_hash == read_file_data[:file_hash]
-              raise "Will not write to #{keypfile}\nHashes differ. Expected hash =#{@file_hash}\n" +
-                        "found hash #{read_file_data[:file_hash]}"
-            end
-          end
-          if @dirty && !@renaming
-            @meta['updated_at'] = Time.now.utc.iso8601(Keyp::TIMESTAMP_FS_DIGITS)
-          end
-
-          file_data = { 'meta' => @meta, 'data' => @data }
-          File.open(keypfile, 'w') do |f|
-            f.write file_data.to_yaml
-          end
-          @dirty = false
-        rescue
-          # TODO: log error
-
-        end
-      else
-        puts "save called but not saving (not dirty or renaming flag set"
-      end
-    end
 
   end # class Bag
 end # module Keyp
