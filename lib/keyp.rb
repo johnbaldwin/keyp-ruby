@@ -168,14 +168,15 @@ module Keyp
   ##
   # Creates a new bag if one does not already exist with the given name
   #
-
+  # raises exception if bag already exists
+  # NOTE: We might want to change this
   def self.create_bag(name, options = {} )
     unless exist? name
       Bag.new(name)
+    else
+      raise "Unable to create a new bag \"#{name}\". It already exists."
     end
-      raise "Unable to create a new store at #{filepath}. One already exists."
   end
-
 
   ##
   # Deletes the bag matching the name

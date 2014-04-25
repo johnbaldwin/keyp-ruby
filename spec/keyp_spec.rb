@@ -85,11 +85,16 @@ describe Keyp do
     # NOTE: Yeah, this code and the bag_spec code are redundant
     before (:each) do
       @from_name = bag_name_for_testing
+      if Keyp::exist?(@from_name)
+        puts "Rename bag, bag #{@from_name} already exists"
+      else
+        puts "Rename bag, bag #{@from_name} does NOT exist"
+      end
       @from_bag = Keyp.create_bag(@from_name)
       sleep(1)
       @to_name = bag_name_for_testing
     end
-=begin
+
     it 'should rename bag if it exists and new name does not' do
       bag = @from_bag
       kp = {
@@ -107,20 +112,31 @@ describe Keyp do
       @to_name.should_not == @from_name
       # we know the to_name does not exist
 
-      #result = bag.rename(@to_name)
       puts "From name=#{@from_name}"
       puts "To name=#{@to_name}"
       result = Keyp.rename_bag(from: @from_name, to: @to_name)
+      puts "result of rename = #{result}"
+      Keyp.exist?(@from_name).should == false
+      Keyp.exist?(@to_name).should == true
+      bag = Keyp.bag @to_name
       bag.name.should == @to_name
       bag.meta['name'].should == @to_name
       bag.meta['created_at'].should == before_meta['created_at']
       # Since we are not changing any key pairs, updated_at doesn't change
       bag.meta['updated_at'].should == before_meta['updated_at']
-      bag.meta['name'].should_not == before_meta['name']
+      kp.each do |k,v|
+        bag.key?(k).should == true
+        bag[k].should == v
+      end
     end
-=end
+
     it 'should not rename bag if current name does not exist'
     it 'should not rename bag if new name exists'
+
+    after (:each) do
+      Keyp.delete_bag @from_name if Keyp.exist? @from_name
+      Keyp.delete_bag @to_name if Keyp.exist? @to_name
+    end
   end
 
 
