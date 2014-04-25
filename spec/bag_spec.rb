@@ -16,6 +16,9 @@ describe Keyp::Bag do
     it "should return an empty hash" do
       @bag.data.size.should == 0
     end
+    after (:each) do
+      Keyp.delete_bag @bag_name if Keyp.exist? @bag_name
+    end
   end
 
   context "is not empty" do
@@ -27,6 +30,9 @@ describe Keyp::Bag do
 
     it "should return a non-empty hash" do
       @bag.data.size.should > 0
+    end
+    after (:each) do
+      Keyp.delete_bag @bag_name if Keyp.exist? @bag_name
     end
   end
 
@@ -76,6 +82,9 @@ describe Keyp::Bag do
 
     it 'should not overwrite existing keys'
     it 'should match filtering pattern'
+    after (:each) do
+      Keyp.delete_bag @bag_name if Keyp.exist? @bag_name
+    end
   end
 
   context 'Bag state' do
@@ -120,6 +129,9 @@ describe Keyp::Bag do
 
     it 'should allow assigning a key if not read only'
     it 'should not allow assigning a key if read only'
+    after (:each) do
+      Keyp.delete_bag @bag_name if Keyp.exist? @bag_name
+    end
   end
 
   context 'Metadata' do
@@ -161,6 +173,9 @@ describe Keyp::Bag do
       @bag.set_name(test_name)
       @bag.name.should == test_name
     end
+    after (:each) do
+      Keyp.delete_bag @bag_name if Keyp.exist? @bag_name
+    end
   end
 
   context 'Bag management' do
@@ -173,7 +188,6 @@ describe Keyp::Bag do
 
     it 'should rename if new name does not exist' do
       bag = @from_bag
-      puts "Testing bag rename with from_name #{@from_name}"
       kp = {
           'key1' => 'value1',
           'key2' => 'value2'
@@ -199,6 +213,10 @@ describe Keyp::Bag do
 
     it 'should not rename if new name exists' do
 
+    end
+    after (:each) do
+      Keyp.delete_bag @from_name if Keyp.exist? @from_name
+      Keyp.delete_bag @to_name if Keyp.exist? @to_name
     end
   end
 

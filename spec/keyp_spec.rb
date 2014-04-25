@@ -110,12 +110,7 @@ describe Keyp do
       bag.meta.each { |k,v| before_meta[k] = v }
       bag.name.should == @from_name
       @to_name.should_not == @from_name
-      # we know the to_name does not exist
-
-      puts "From name=#{@from_name}"
-      puts "To name=#{@to_name}"
       result = Keyp.rename_bag(from: @from_name, to: @to_name)
-      puts "result of rename = #{result}"
       Keyp.exist?(@from_name).should == false
       Keyp.exist?(@to_name).should == true
       bag = Keyp.bag @to_name
