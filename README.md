@@ -12,7 +12,7 @@ Web applications generally need sensitive information, like salts and keys. Mana
 
 ## Important
 
-Keyp is still in early development and is experimental. As such it is very much a work in progress. Not all features
+Keyp is still in early development. As such it is very much a work in progress. Not all features
 expressed in the documentation may be working. The documentation may be plain wrong. I don't recommend you use Keyp
 for any kind of production code at this point in this gem's lifecycle.
 
@@ -96,7 +96,7 @@ TODO: Write more detailed documentation, For now, see the quick start above and 
     $ keyp --help
 
 ## Release Notes
-* v 0.0.7 - Added loading a bag from the ENV. fixed error with keys of lett than three characters.
+* v 0.0.7 - Added loading a bag from the ENV. Added renaming bags Fixed error with keys of less than three characters.
 * v 0.0.6 - Added copying key:values to the Ruby ENV in the library (still have to implement in the CLI)
 * v 0.0.5 - Fixed iso8601 error
 * v 0.0.4 - Fixed missing file error
